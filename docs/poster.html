@@ -19,7 +19,7 @@
     const SERIF = '"Didot","Bodoni 72",serif';
     const SANS = '"Avenir Next","Helvetica Neue",sans-serif';
     const at = (h, m, s) => { const t = new Date(); t.setHours(h, m, s || 31, 0); return t; };
-    const cfgOf = (model, extra) => Object.assign({}, E.DEFAULTS, E.MODELS[model].defaults, { model, light: 'fixed' }, extra || {});
+    const cfgOf = (model, extra) => Object.assign({}, E.DEFAULTS, E.MODELS[model].defaults, { model, light: 'fixed', emblem: 'printed' }, extra || {});
     const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
     const png = (c) => c.toDataURL('image/png').split(',')[1];
 
