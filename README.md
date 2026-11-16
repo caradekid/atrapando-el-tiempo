@@ -22,7 +22,7 @@ A gift from **Caradekid** to the **Atrapando el tiempo** channel and its communi
 | **Desktop** | Live dial at 60 fps, synced to the system clock and time zone. Sits below the Finder icons and pauses itself when hidden or when the display sleeps. |
 | **Login and lock screen** | *Apply to login & lock screen* renders a light/dark HEIC (the format Apple uses for its own dynamic wallpapers) at your display's native resolution. |
 | **Screen saver** | *Atrapando el Tiempo* runs the same live dial. It appears on the lock screen when the Mac is idle. |
-| **Living light** | The key light follows the time of day: from the left in the morning, from above at noon, amber from the right at sunset, a warm desk lamp at night. Reflections on hands, indices, dial and crystal move with it, and the crystal and hands shift slightly as you move the cursor, like tilting a real watch. |
+| **Living light** | The key light follows the time of day: from the left in the morning, from above at noon, amber from the right at sunset, a warm desk lamp at night. Reflections on hands, indices, dial and crystal move with it, and moving the cursor turns the light, so reflections sweep across the dial, hands and crystal like tilting a real watch under a lamp. |
 | **Light / Dark** | Follows macOS automatically. Each dial can have its own *night* version, and the lume glows in dark mode. |
 
 > **About the login window:** macOS only allows a **still** image there, so it shows the design at 10:10 (the classic watch-advert pose). The live animation runs on the desktop and in the screen saver.

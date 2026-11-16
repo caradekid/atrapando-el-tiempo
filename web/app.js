@@ -225,7 +225,7 @@
     const posSeg = segmented('position', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']]);
     const fpsSeg = segmented('fps', [[60, 'Smooth'], [30, 'Balanced'], [15, 'Eco']]);
     const lightSeg = segmented('light', [['time', 'Time of day'], ['fixed', 'Studio']]);
-    const parallaxToggle = toggle('parallax', 'Tilt with the cursor');
+    const parallaxToggle = toggle('parallax', 'Light follows the cursor');
     const bgLight = h('input', { type: 'color', oninput: (e) => update({ bgLight: e.target.value }), 'aria-label': 'Light background' });
     const bgDark = h('input', { type: 'color', oninput: (e) => update({ bgDark: e.target.value }), 'aria-label': 'Dark background' });
     // watch diameter as a share of the screen height

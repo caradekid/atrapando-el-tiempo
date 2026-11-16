@@ -804,8 +804,7 @@
       // rotated rectangle, upper left, with feathered edges
       const ca = Math.cos(0.62), sa = Math.sin(0.62);
       const x = (u + 0.36) * ca + (v + 0.4) * sa, y = -(u + 0.36) * sa + (v + 0.4) * ca;
-      const edge = (q, half, soft) => Math.min(1, Math.max(0, (half - Math.abs(q)) / soft));
-      const box = edge(x, 0.34, 0.05) * edge(y, 0.09, 0.03);
+      const box = Math.exp(-(x * x) / 0.06 - (y * y) / 0.004);
       const k = ctx.lightDial ? 0.04 : 0.085;
       return [1 + Math.exp(-d * 4) * 0.2, Math.exp(-d * 9) * 0.03 + box * k];
     },
@@ -2496,16 +2495,13 @@
       }
       this.box = box;
       this._renderDial();
+      applyLight(this.light);
       const pr = this.print.getContext('2d');
       pr.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       pr.translate(box, box);
       drawStaticPrint(pr, R, this.env, this.geo);
-      const gl = this.glass.getContext('2d');
-      gl.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-      gl.translate(box, box);
-      drawCyclops(gl, this.env, this.geo);
-      drawGlass(gl, this.env, this.geo);
-      if (!RING_MODELS[this.env.model.bezel]) drawDiscEdge(gl, this.center.R, this.env);
+      applyLight(this.light);
+      this._renderGlass();
       this.bridge = buildBridge(this.env, this.geo, this.dpr * 1.5);
       this._draw(now);
     }
@@ -2518,7 +2514,7 @@
       ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       ctx.clearRect(0, 0, this.box * 2, this.box * 2);
       ctx.translate(this.box, this.box);
-      applyLight(this.light);
+      applyLight(this._cursorLight());
       drawDynamic(ctx, this.env, this.geo, now, this.bridge);
     }
     _tick(ts) {
@@ -2543,12 +2539,24 @@
     }
     // The dial surface comes from the GPU: relief, brushed metal and lacquer lit live,
     // with the view tilted by the cursor so highlights glide across it.
+    // The cursor turns the key light, like tilting a watch under a lamp: up to ~35°
+    // left/right, and a touch brighter or dimmer up/down. Nothing on the dial moves.
+    _cursorLight() {
+      const l = this.light;
+      if (!this.cfg.parallax) return l;
+      return {
+        angle: l.angle + this.par.x * 0.95,
+        warmth: l.warmth,
+        intensity: Math.max(0.6, Math.min(1.15, l.intensity * (1 - this.par.y * 0.18))),
+      };
+    }
+    // The dial surface comes from the GPU: relief, brushed metal and lacquer lit live.
     _renderDial() {
       const ctx = this.dial.getContext('2d');
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, this.dial.width, this.dial.height);
       if (!this.glKind) return;
-      applyLight(this.light);
+      applyLight(this._cursorLight());
       const Rd = this.geo.Rd;
       const px = Rd * 2 * this.dpr;
       const tilt = this.cfg.parallax ? this.par : { x: 0, y: 0 };
@@ -2557,24 +2565,34 @@
       const off = (this.box - Rd) * this.dpr;
       ctx.drawImage(img, off, off, px, px);
     }
+    // Crystal reflections, magnifier and dial edge: cheap 2D, redrawn as the light turns.
+    _renderGlass() {
+      const g = this.glass.getContext('2d');
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, this.glass.width, this.glass.height);
+      g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      g.translate(this.box, this.box);
+      applyLight(this._cursorLight());
+      drawCyclops(g, this.env, this.geo);
+      drawGlass(g, this.env, this.geo);
+      if (!RING_MODELS[this.env.model.bezel]) drawDiscEdge(g, this.center.R, this.env);
+    }
     /** Cursor position relative to the watch, -1…1 on each axis. */
     setPointer(x, y) {
       this.pointer.x = Math.max(-1, Math.min(1, x));
       this.pointer.y = Math.max(-1, Math.min(1, y));
     }
-    // Tilting a watch: the crystal's reflections slide the most, the hands a little,
-    // the dial stays put. Eased so it feels physical.
+    // Follow the cursor smoothly and relight the dial surface and the crystal.
     _parallax() {
       if (!this.center) return;
       const target = this.cfg.parallax ? this.pointer : { x: 0, y: 0 };
       const dx = target.x - this.par.x, dy = target.y - this.par.y;
-      if (Math.abs(dx) < 0.0005 && Math.abs(dy) < 0.0005) return;
+      if (Math.abs(dx) < 0.002 && Math.abs(dy) < 0.002) return;
       this.par.x += dx * 0.12;
       this.par.y += dy * 0.12;
-      const R = this.center.R;
-      this.live.style.transform = `translate(${(-this.par.x * R * 0.01).toFixed(2)}px, ${(-this.par.y * R * 0.01).toFixed(2)}px)`;
-      this.glass.style.transform = `translate(${(-this.par.x * R * 0.028).toFixed(2)}px, ${(-this.par.y * R * 0.028).toFixed(2)}px)`;
       if (this.glKind) this._renderDial();
+      this._renderGlass();
+      applyLight(this.light);
     }
     start() {
       if (this.running) return;

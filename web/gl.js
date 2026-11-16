@@ -134,7 +134,7 @@
       N = normalize(N + vec3(uv * 0.06, 0.0));
 
       vec3 L = normalize(vec3(uLight * 0.85, 0.62));
-      vec3 V = normalize(vec3(-uTilt * 0.62, 1.0));
+      vec3 V = normalize(vec3(-uTilt * 0.9, 1.0));
       vec3 H = normalize(L + V);
       vec3 warmTint = mix(vec3(1.0), vec3(1.0, 0.79, 0.56), uWarm * 0.7);
 
@@ -166,8 +166,8 @@
         vec2 d = (R.xy - uLight * 0.2) / 0.36;
         vec2 ax = vec2(-uLight.y, uLight.x);
         float along = dot(d, ax), across = dot(d, uLight);
-        float box = smoothstep(0.36, 0.3, abs(along)) * smoothstep(0.1, 0.065, abs(across));
-        spec = box * (uLightDial > 0.5 ? 0.05 : 0.12) + pow(max(dot(Nd, H), 0.0), 30.0) * 0.06;
+        float box = exp(-(along * along) / 0.06 - (across * across) / 0.004);
+        spec = box * (uLightDial > 0.5 ? 0.04 : 0.09) + pow(max(dot(Nd, H), 0.0), 30.0) * 0.06;
       } else {
         float shin = uKind == 1 ? 18.0 : uKind == 9 ? 60.0 : uKind == 5 ? 45.0 : 12.0;
         float ks = uKind == 1 ? 0.12 : uKind == 9 ? 0.35 : uKind == 5 ? 0.45 : uKind == 2 ? 0.18 : 0.05;
