@@ -48,7 +48,7 @@ final class LoginExporter: NSObject, WKNavigationDelegate {
             } else {
                 let light = try await snapshot(renderer, width: width, height: height, dark: false)
                 let dark = try await snapshot(renderer, width: width, height: height, dark: true)
-                url = outputDirectory.appendingPathComponent("tourbillon-\(key)-\(stamp).heic")
+                url = outputDirectory.appendingPathComponent("atrapando-el-tiempo-\(key)-\(stamp).heic")
                 try Self.writeAppearanceHEIC(light: light, dark: dark, to: url)
                 cache[key] = url
                 written.append(url)

@@ -1,5 +1,5 @@
 /*
- * Tourbillon — watch rendering engine.
+ * Atrapando el tiempo × Caradekid — watch dial rendering engine.
  * Pure Canvas 2D. No network, no external assets, system fonts only.
  *
  * Coordinates: origin at the watch centre, y grows downwards.
@@ -198,15 +198,16 @@
     centralSeconds: true,
     date: true,
     lume: true,
-    wordmark: 'MAISON',
-    subline: 'Automatic',
+    emblem: 'medallion',
+    wordmark: 'ATRAPANDO EL TIEMPO',
+    subline: 'x Caradekid',
     font: 'didot',
     appearance: 'auto',
     background: 'studio',
     bgLight: '#ece9e3',
     bgDark: '#0d0e10',
     position: 'center',
-    size: 0.53,
+    size: 0.5,
     fps: 60,
   };
 
@@ -218,6 +219,7 @@
     if (!MATERIALS[c.material]) c.material = DEFAULTS.material;
     if (!BEZELS[c.bezel]) c.bezel = DEFAULTS.bezel;
     if (!FONTS[c.font]) c.font = DEFAULTS.font;
+    if (!['medallion', 'printed', 'none'].includes(c.emblem)) c.emblem = DEFAULTS.emblem;
     c.size = clamp(Number(c.size) || DEFAULTS.size, 0.2, 0.9);
     c.fps = Number(c.fps) === 30 ? 30 : Number(c.fps) === 15 ? 15 : 60;
     c.wordmark = String(c.wordmark ?? '').slice(0, 24);
@@ -995,25 +997,153 @@
     ctx.restore();
   }
 
+  /* ------------------------------------------------------------ channel emblem */
+  // "Atrapando el tiempo" mark, redrawn as vectors from the 620 px artwork:
+  // three rounded strokes and the red dot. Coordinates are in the artwork's space.
+  const EMBLEM = {
+    cx: 310, cy: 276, size: 440, half: 24, corner: 11, base: 452,
+    // [bottom-centre x, top x, top y]: the bottoms sit on one baseline, the tops are rounded
+    strokes: [[122, 252, 212], [258, 375.7, 234.6], [490, 305, 100]],
+    dot: [377, 433, 19.5],
+    red: '#e5401d',
+  };
+
+  function logoStroke(ctx, xb, xt, yt) {
+    const yb = EMBLEM.base, hw = EMBLEM.half, rc = EMBLEM.corner;
+    const len = Math.hypot(xt - xb, yt - yb);
+    const d = { x: (xt - xb) / len, y: (yt - yb) / len };
+    const n = { x: -d.y, y: d.x };
+    const atBase = (sx) => {
+      const px = xb + n.x * hw * sx, py = yb + n.y * hw * sx;
+      const t = (yb - py) / d.y;
+      return { x: px + d.x * t, y: yb };
+    };
+    const BR = atBase(1), BL = atBase(-1);
+    const TR = { x: xt + n.x * hw, y: yt + n.y * hw };
+    const a1 = Math.atan2(n.y, n.x);
+    ctx.moveTo((BL.x + BR.x) / 2, yb);
+    ctx.arcTo(BR.x, BR.y, TR.x, TR.y, rc);
+    ctx.lineTo(TR.x, TR.y);
+    ctx.arc(xt, yt, hw, a1, a1 + Math.PI, true);
+    ctx.arcTo(BL.x, BL.y, (BL.x + BR.x) / 2, yb, rc);
+    ctx.closePath();
+  }
+
+  function drawLogo(ctx, size, ink, red) {
+    const k = size / EMBLEM.size;
+    ctx.save();
+    ctx.scale(k, k);
+    ctx.translate(-EMBLEM.cx, -EMBLEM.cy);
+    ctx.fillStyle = ink;
+    ctx.beginPath();
+    EMBLEM.strokes.forEach(([xb, xt, yt]) => logoStroke(ctx, xb, xt, yt));
+    ctx.fill('nonzero');
+    const [dx, dy, dr] = EMBLEM.dot;
+    ctx.shadowColor = 'transparent';
+    circle(ctx, dx, dy, dr);
+    ctx.fillStyle = red;
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function emblemCenter(env, g) {
+    return { x: 0, y: -g.Rd * (env.model.subdials ? 0.5 : 0.48) };
+  }
+
+  function drawEmblem(ctx, env, g) {
+    const mode = env.cfg.emblem;
+    if (mode === 'none') return;
+    const Rd = g.Rd;
+    const c = emblemCenter(env, g);
+    const m = Rd * 0.115;
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    if (mode === 'printed') {
+      drawLogo(ctx, m * 1.7, env.dial.ink, EMBLEM.red);
+      ctx.restore();
+      return;
+    }
+    // applied medallion: polished bezel, charcoal enamel, raised white mark
+    ctx.save();
+    ctx.shadowColor = env.dark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = m * 0.25;
+    ctx.shadowOffsetX = m * 0.04;
+    ctx.shadowOffsetY = m * 0.1;
+    circle(ctx, 0, 0, m * 1.13);
+    ctx.fillStyle = metalConic(ctx, 0, 0, env.mat, 0.3);
+    ctx.fill();
+    ctx.restore();
+    circle(ctx, 0, 0, m * 1.13);
+    ctx.strokeStyle = rgba(env.mat.edge, 0.5);
+    ctx.lineWidth = m * 0.02;
+    ctx.stroke();
+    circle(ctx, 0, 0, m);
+    const enamel = ctx.createRadialGradient(-m * 0.3, -m * 0.4, m * 0.05, 0, 0, m);
+    enamel.addColorStop(0, '#3e3e41');
+    enamel.addColorStop(1, '#1b1b1d');
+    ctx.fillStyle = enamel;
+    ctx.fill();
+    // inner bevel shadow
+    const bevel = ctx.createRadialGradient(0, 0, m * 0.8, 0, 0, m);
+    bevel.addColorStop(0, 'rgba(0,0,0,0)');
+    bevel.addColorStop(1, 'rgba(0,0,0,0.45)');
+    ctx.fillStyle = bevel;
+    ctx.fill();
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = m * 0.06;
+    ctx.shadowOffsetY = m * 0.03;
+    drawLogo(ctx, m * 1.48, '#f4f3ef', EMBLEM.red);
+    ctx.restore();
+    // glaze highlight
+    ctx.save();
+    circle(ctx, 0, 0, m);
+    ctx.clip();
+    ctx.beginPath();
+    ctx.ellipse(-m * 0.25, -m * 0.55, m * 0.95, m * 0.5, -0.4, 0, TAU);
+    const gl = ctx.createLinearGradient(0, -m, 0, 0);
+    gl.addColorStop(0, 'rgba(255,255,255,0.16)');
+    gl.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gl;
+    ctx.fill();
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function fitFont(ctx, text, weight, size, font, spacing, maxW) {
+    ctx.font = `${weight} ${size}px ${font}`;
+    const w = ctx.measureText(text).width + spacing * Math.max(0, [...text].length - 1);
+    if (w > maxW) {
+      size *= maxW / w;
+      ctx.font = `${weight} ${size}px ${font}`;
+    }
+    return size;
+  }
+
   function drawWordmark(ctx, env, g) {
     const { cfg, dial } = env;
     const Rd = g.Rd;
-    const y = env.model.indices === 'arabic' ? -Rd * 0.42 : env.model.subdials ? -Rd * 0.42 : -Rd * 0.46;
+    const withEmblem = cfg.emblem !== 'none';
+    const y = withEmblem ? emblemCenter(env, g).y + Rd * 0.2
+      : env.model.indices === 'arabic' || env.model.subdials ? -Rd * 0.42 : -Rd * 0.46;
     ctx.save();
     ctx.fillStyle = dial.ink;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
+    let size = Rd * (withEmblem ? 0.062 : 0.085);
     if (cfg.wordmark) {
-      ctx.font = `400 ${Rd * 0.085}px ${env.font}`;
-      spacedText(ctx, cfg.wordmark, 0, y, Rd * 0.018);
+      const sp = size * 0.22;
+      size = fitFont(ctx, cfg.wordmark, 400, size, env.font, sp, Rd * 0.7);
+      spacedText(ctx, cfg.wordmark, 0, y, size * 0.22);
     }
     if (cfg.subline) {
       ctx.globalAlpha = 0.75;
-      ctx.font = `italic 400 ${Rd * 0.05}px ${env.font}`;
-      spacedText(ctx, cfg.subline, 0, y + Rd * 0.085, Rd * 0.004);
+      const sub = fitFont(ctx, cfg.subline, 'italic 400', Rd * (withEmblem ? 0.045 : 0.05), env.font, 0, Rd * 0.7);
+      spacedText(ctx, cfg.subline, 0, y + size * 0.5 + sub * 0.85, Rd * 0.004);
     }
     ctx.restore();
   }
+
 
   const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   function dateGeometry(env, g) {
@@ -1743,6 +1873,7 @@
     drawIndices(ctx, env, g);
     if (g.subs) g.subs.forEach((s) => drawSubdial(ctx, env, s));
     if (g.smallSeconds) drawSubdial(ctx, env, Object.assign({ kind: 'sec' }, g.smallSeconds));
+    drawEmblem(ctx, env, g);
     drawWordmark(ctx, env, g);
     drawDate(ctx, env, g);
     drawPowerReserve(ctx, env, g);
@@ -1951,7 +2082,7 @@
   }
 
   root.TourbillonEngine = {
-    MODELS, DIALS, MATERIALS, BEZELS, FONTS, DEFAULTS,
+    MODELS, DIALS, MATERIALS, BEZELS, FONTS, drawLogo, EMBLEM, DEFAULTS,
     normalizeConfig, composeFrame, renderWatch, Scene, mix,
   };
 })(typeof window !== 'undefined' ? window : this);

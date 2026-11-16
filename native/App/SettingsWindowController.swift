@@ -12,13 +12,13 @@ final class SettingsWindowController: NSWindowController, WKScriptMessageHandler
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1180, height: 760),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                               backing: .buffered, defer: false)
-        window.title = "Tourbillon"
+        window.title = "Atrapando el tiempo × Caradekid"
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.minSize = NSSize(width: 860, height: 560)
         window.isReleasedWhenClosed = false
         window.center()
-        window.setFrameAutosaveName("TourbillonSettings")
+        window.setFrameAutosaveName("AtrapandoElTiempoSettings")
         self.init(window: window)
         window.delegate = self
 

@@ -1,4 +1,8 @@
-# Tourbillon
+# Atrapando el tiempo × Caradekid
+
+<p align="center"><img src="assets/icon-1024.png" width="140" alt="Dial with the Atrapando el tiempo medallion"></p>
+
+A gift from **Caradekid** to the **Atrapando el tiempo** channel and its community. Every dial carries the channel emblem as an applied medallion: a polished bezel, charcoal enamel and the mark with its red dot, redrawn as vectors so it stays sharp at any size.
 
 **Live watch-dial wallpaper for macOS.** Photorealistic dials inspired by the great Japanese, Swiss and Spanish classics, showing your Mac's real time. Works 100 % offline, follows Light and Dark mode, and also covers the **login screen**, the **lock screen** and the **screen saver**.
 
@@ -15,7 +19,7 @@
 | --- | --- |
 | **Desktop** | Live dial at 60 fps, synced to the system clock and time zone. Sits below the Finder icons and pauses itself when hidden or when the display sleeps. |
 | **Login and lock screen** | *Apply to login & lock screen* renders a light/dark HEIC (the format Apple uses for its own dynamic wallpapers) at your display's native resolution. |
-| **Screen saver** | `Tourbillon.saver` runs the same live dial. It appears on the lock screen when the Mac is idle. |
+| **Screen saver** | *Atrapando el Tiempo* runs the same live dial. It appears on the lock screen when the Mac is idle. |
 | **Light / Dark** | Follows macOS automatically. Each dial can have its own *night* version, and the lume glows in dark mode. |
 
 > **About the login window:** macOS only allows a **still** image there, so it shows the design at 10:10 (the classic watch-advert pose). The live animation runs on the desktop and in the screen saver.
@@ -42,28 +46,28 @@ All dials are procedural (no image files): textures computed pixel by pixel with
 | 🇪🇸 Spain | **Racing Chrono** | Racing chronograph, colour registers, quartz tick |
 | 🇪🇸 Spain | **Mediterráneo** | Vintage *compressor* diver with an inner scale and orange accents |
 
-**Customisable:** dial colour (day and night), metal of the hands and indices, outer ring colour, date, central seconds, tourbillon (on any dial), lume, signature text and typeface, background (studio, spotlight, solid) with light/dark colours, position, size and frame rate (60/30/15 fps to save battery).
+**Customisable:** channel emblem (medallion, printed or off), dial colour (day and night), metal of the hands and indices, outer ring colour, date, central seconds, tourbillon (on any dial), lume, signature text and typeface, background (studio, spotlight, solid) with light/dark colours, position, size and frame rate (60/30/15 fps to save battery).
 
-> The designs are *inspired by* well-known styles. They do not reproduce brand names or logos: the signature on the dial is whatever you type.
+> The designs are *inspired by* well-known styles. They do not reproduce watch brand names or logos. The signature defaults to *ATRAPANDO EL TIEMPO · x Caradekid* and you can change it.
 
 ## Install
 
 You need macOS 13 or later and the Command Line Tools (`xcode-select --install`). Full Xcode is not required.
 
 ```bash
-git clone https://github.com/caradekid/tourbillon-wallpaper.git
+git clone https://github.com/caradekid/atrapando-el-tiempo.git
 ```
 
 ```bash
-cd tourbillon-wallpaper && make install
+cd atrapando-el-tiempo && make install
 ```
 
-`make install` builds a universal app (Apple Silicon + Intel), copies it to `/Applications` and opens it. A watch icon appears in the menu bar:
+`make install` builds a universal app (Apple Silicon + Intel), copies it to `/Applications/Atrapando el Tiempo.app` and opens it. The channel logo appears in the menu bar:
 
 - **Live Wallpaper** — turns the live dial on or off
 - **Settings…** — editor with a live preview
 - **Apply to Login & Lock Screen** — generates and sets the light/dark image
-- **Install Screen Saver…** — installs it and opens System Settings so you can choose *Tourbillon*
+- **Install Screen Saver…** — installs it and opens System Settings so you can choose *Atrapando el Tiempo*
 - **Open at Login**
 
 Every change you make in Settings is applied instantly to the desktop and to the installed screen saver.
@@ -76,7 +80,7 @@ Open `web/index.html` in a browser to design your dial and download it as a PNG 
 
 ```
 web/            Rendering engine (Canvas 2D, no dependencies) and editor
-  engine.js     Dials, textures, hands, tourbillon, light/dark
+  engine.js     Dials, textures, hands, tourbillon, channel emblem, light/dark
   app.js        Editor and native bridge
 native/App      Menu bar app (Swift/AppKit + WebKit)
 native/Saver    Screen saver (ScreenSaver.framework + WebKit)
@@ -90,6 +94,10 @@ The same engine powers the desktop, the screen saver, the login image and the br
 swift scripts/render.swift docs/test.png 2880 1800 dark cocktail
 ```
 
+## Credits
+
+Concept and design by **Caradekid** for **Atrapando el tiempo**. The channel emblem belongs to Atrapando el tiempo and is used here with that gift in mind. The code is MIT-licensed; the emblem is not covered by that license.
+
 ## License
 
-MIT
+MIT (code only)

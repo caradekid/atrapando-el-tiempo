@@ -24,9 +24,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        let symbol = NSImage(systemSymbolName: "watch.analog", accessibilityDescription: "Tourbillon")
-            ?? NSImage(systemSymbolName: "clock", accessibilityDescription: "Tourbillon")
-        statusItem.button?.image = symbol
+        statusItem.button?.image = ChannelLogo.menuBarImage()
+        statusItem.button?.toolTip = "Atrapando el tiempo × Caradekid"
         let menu = NSMenu()
         menu.delegate = self
         statusItem.menu = menu
@@ -59,7 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         login.state = SMAppService.mainApp.status == .enabled ? .on : .off
         menu.addItem(login)
         menu.addItem(.separator())
-        menu.addItem(item("Quit Tourbillon", #selector(quit), key: "q"))
+        menu.addItem(item("Quit Atrapando el Tiempo", #selector(quit), key: "q"))
     }
 
     private func item(_ title: String, _ action: Selector, key: String = "") -> NSMenuItem {
@@ -112,7 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             do {
                 try ScreenSaverInstaller.install()
                 ScreenSaverInstaller.openSettings()
-                return "Screen saver installed. Choose “Tourbillon” in System Settings."
+                return "Screen saver installed. Choose “Atrapando el Tiempo” in System Settings."
             } catch {
                 return "Could not install the screen saver: \(error.localizedDescription)"
             }
@@ -127,7 +126,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func notify(_ text: String) {
         guard !text.isEmpty else { return }
         let alert = NSAlert()
-        alert.messageText = "Tourbillon"
+        alert.messageText = "Atrapando el tiempo"
         alert.informativeText = text
         NSApp.activate(ignoringOtherApps: true)
         alert.runModal()

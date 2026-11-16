@@ -1,15 +1,15 @@
 import AppKit
 
-/// Copies the bundled Tourbillon.saver into ~/Library/Screen Savers and keeps its
+/// Copies the bundled screen saver into ~/Library/Screen Savers and keeps its
 /// config.json in step with the app, so the screen saver shows the same design.
 enum ScreenSaverInstaller {
     static var installedURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Screen Savers/Tourbillon.saver", isDirectory: true)
+            .appendingPathComponent("Library/Screen Savers/Atrapando el Tiempo.saver", isDirectory: true)
     }
 
     static var bundledURL: URL? {
-        Bundle.main.resourceURL?.appendingPathComponent("Tourbillon.saver", isDirectory: true)
+        Bundle.main.resourceURL?.appendingPathComponent("AtrapandoElTiempo.saver", isDirectory: true)
     }
 
     static var isInstalled: Bool { FileManager.default.fileExists(atPath: installedURL.path) }
@@ -22,6 +22,9 @@ enum ScreenSaverInstaller {
         try fm.createDirectory(at: installedURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         if fm.fileExists(atPath: installedURL.path) { try fm.removeItem(at: installedURL) }
         try fm.copyItem(at: source, to: installedURL)
+        // remove the build that shipped under the project's earlier name
+        let legacy = installedURL.deletingLastPathComponent().appendingPathComponent("Tourbillon.saver")
+        if fm.fileExists(atPath: legacy.path) { try? fm.removeItem(at: legacy) }
         syncConfig(ConfigStore.shared.json)
     }
 

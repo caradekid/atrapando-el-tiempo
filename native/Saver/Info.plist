@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>Tourbillon</string>
+	<string>Atrapando el Tiempo</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.github.tourbillon-wallpaper.saver</string>
+	<string>io.github.caradekid.atrapando-el-tiempo.saver</string>
 	<key>CFBundleExecutable</key>
-	<string>Tourbillon</string>
+	<string>AtrapandoElTiempo</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>

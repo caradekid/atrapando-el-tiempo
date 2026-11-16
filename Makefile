@@ -1,8 +1,10 @@
-# Builds Tourbillon.app (menu bar app + live wallpaper) with the screen saver bundled inside.
+# Atrapando el tiempo x Caradekid
+# Builds the menu bar app (live wallpaper) with the screen saver bundled inside.
 # Needs only the Xcode Command Line Tools (xcode-select --install).
 
-APP      := build/Tourbillon.app
-SAVER    := build/Tourbillon.saver
+APP      := build/AtrapandoElTiempo.app
+SAVER    := build/AtrapandoElTiempo.saver
+APP_NAME := Atrapando el Tiempo
 MIN_OS   := 13.0
 ARCHS    := arm64 x86_64
 SWIFT    := swiftc -O -swift-version 5
@@ -20,10 +22,10 @@ app: $(APP)
 $(SAVER): $(SAVER_SRC) native/Saver/Info.plist $(WEB)
 	rm -rf $@ && mkdir -p $@/Contents/MacOS $@/Contents/Resources/web build/obj
 	for a in $(ARCHS); do \
-	  $(SWIFT) -target $$a-apple-macos$(MIN_OS) -emit-library -module-name TourbillonSaver \
+	  $(SWIFT) -target $$a-apple-macos$(MIN_OS) -emit-library -module-name AtrapandoElTiempoSaver \
 	    -framework ScreenSaver -framework WebKit -o build/obj/saver-$$a $(SAVER_SRC) || exit 1; \
 	done
-	lipo -create $(foreach a,$(ARCHS),build/obj/saver-$(a)) -output $@/Contents/MacOS/Tourbillon
+	lipo -create $(foreach a,$(ARCHS),build/obj/saver-$(a)) -output $@/Contents/MacOS/AtrapandoElTiempo
 	cp native/Saver/Info.plist $@/Contents/Info.plist
 	cp web/index.html web/engine.js web/app.js web/styles.css $@/Contents/Resources/web/
 	[ -f assets/thumbnail.png ] && cp assets/thumbnail*.png $@/Contents/Resources/ || true
@@ -32,11 +34,11 @@ $(SAVER): $(SAVER_SRC) native/Saver/Info.plist $(WEB)
 $(APP): $(APP_SRC) native/App/Info.plist $(WEB) $(SAVER)
 	rm -rf $@ && mkdir -p $@/Contents/MacOS $@/Contents/Resources/web build/obj
 	for a in $(ARCHS); do \
-	  $(SWIFT) -target $$a-apple-macos$(MIN_OS) -module-name Tourbillon \
+	  $(SWIFT) -target $$a-apple-macos$(MIN_OS) -module-name AtrapandoElTiempo \
 	    -framework AppKit -framework WebKit -framework ServiceManagement \
 	    -o build/obj/app-$$a $(APP_SRC) || exit 1; \
 	done
-	lipo -create $(foreach a,$(ARCHS),build/obj/app-$(a)) -output $@/Contents/MacOS/Tourbillon
+	lipo -create $(foreach a,$(ARCHS),build/obj/app-$(a)) -output $@/Contents/MacOS/AtrapandoElTiempo
 	cp native/App/Info.plist $@/Contents/Info.plist
 	cp web/index.html web/engine.js web/app.js web/styles.css $@/Contents/Resources/web/
 	[ -f assets/AppIcon.icns ] && cp assets/AppIcon.icns $@/Contents/Resources/ || true
@@ -47,13 +49,14 @@ run: app
 	open $(APP)
 
 install: app
-	rm -rf /Applications/Tourbillon.app && cp -R $(APP) /Applications/
-	open /Applications/Tourbillon.app
+	rm -rf "/Applications/$(APP_NAME).app" /Applications/Tourbillon.app
+	cp -R $(APP) "/Applications/$(APP_NAME).app"
+	open "/Applications/$(APP_NAME).app"
 
 install-saver: saver
 	mkdir -p "$(HOME)/Library/Screen Savers"
-	rm -rf "$(HOME)/Library/Screen Savers/Tourbillon.saver"
-	cp -R $(SAVER) "$(HOME)/Library/Screen Savers/"
+	rm -rf "$(HOME)/Library/Screen Savers/Tourbillon.saver" "$(HOME)/Library/Screen Savers/$(APP_NAME).saver"
+	cp -R $(SAVER) "$(HOME)/Library/Screen Savers/$(APP_NAME).saver"
 
 clean:
 	rm -rf build

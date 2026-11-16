@@ -1,5 +1,5 @@
 /*
- * Tourbillon — page controller.
+ * Atrapando el tiempo × Caradekid — page controller.
  * Modes: "settings" (editor with live preview), "wallpaper" and "saver" (full-screen scene).
  * The native shell injects window.TB_BOOT = { mode, config, native } before this script runs.
  * In a plain browser the editor opens and settings are kept in localStorage.
@@ -12,7 +12,7 @@
   const mode = boot.mode || params.get('mode') || 'settings';
   const bridge = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.tourbillon;
   const isNative = !!(boot.native && bridge);
-  const STORE_KEY = 'tourbillon.config.v1';
+  const STORE_KEY = 'atrapando-el-tiempo.config.v1';
 
   function post(msg) {
     try { if (bridge) bridge.postMessage(msg); } catch (e) { /* not native */ }
@@ -139,7 +139,7 @@
     previewSeg._sync('auto');
     const stage = h('div', { class: 'stage' },
       h('div', { class: 'stage-bar' },
-        h('div', { class: 'brand' }, 'Tourbillon', h('small', {}, 'Live watch wallpaper · works offline')),
+        h('div', { class: 'brand' }, 'Atrapando el tiempo', h('small', {}, '× Caradekid · live watch wallpaper · works offline')),
         h('div', { class: 'row' }, h('span', { class: 'sub-label', style: 'margin:0' }, 'Preview'), previewSeg)),
       h('div', { class: 'preview-wrap' }, previewHost),
       h('div', { class: 'stage-foot' }, 'Light and dark follow macOS automatically when Appearance is set to Auto.'),
@@ -206,6 +206,8 @@
 
     const wordmark = h('input', { type: 'text', maxlength: 24, placeholder: 'Your signature', oninput: (e) => update({ wordmark: e.target.value }) });
     const subline = h('input', { type: 'text', maxlength: 32, placeholder: 'Second line', oninput: (e) => update({ subline: e.target.value }) });
+    const emblemSeg = segmented('emblem', [['medallion', 'Medallion'], ['printed', 'Printed'], ['none', 'Off']]);
+    syncs.push((c) => emblemSeg._sync(c.emblem));
     const fontSel = h('select', { onchange: (e) => update({ font: e.target.value }) },
       Object.entries(E.FONTS).map(([k, f]) => h('option', { value: k }, f.name)));
     syncs.push((c) => {
@@ -253,7 +255,7 @@
         const b64 = window.TBApp.snapshot(w, hh, name === 'downloadDark');
         const a = document.createElement('a');
         a.href = 'data:image/png;base64,' + b64;
-        a.download = `tourbillon-${config.model}-${name === 'downloadDark' ? 'dark' : 'light'}.png`;
+        a.download = `atrapando-el-tiempo-${config.model}-${name === 'downloadDark' ? 'dark' : 'light'}.png`;
         a.click();
         return;
       }
@@ -270,7 +272,7 @@
       section('Dial', dialSw, h('div', { class: 'sub-label' }, 'Dial at night (dark mode)'), nightSw),
       section('Hands & indices', matSw, bezelBlock),
       section('Complications', ...toggles),
-      section('Signature', row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
+      section('Signature', row('Channel emblem', emblemSeg), row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
       section('Scene',
         row('Appearance', appearanceSeg),
         row('Background', bgSeg),

@@ -7,8 +7,19 @@ final class ConfigStore {
 
     let supportDirectory: URL = {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let dir = base.appendingPathComponent("Tourbillon", isDirectory: true)
+        let dir = base.appendingPathComponent("Atrapando el Tiempo", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        // carry the design over from the project's earlier name
+        let legacy = base.appendingPathComponent("Tourbillon/config.json")
+        let current = dir.appendingPathComponent("config.json")
+        if !FileManager.default.fileExists(atPath: current.path),
+           let data = try? Data(contentsOf: legacy),
+           var object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+            object["wordmark"] = "ATRAPANDO EL TIEMPO"
+            object["subline"] = "x Caradekid"
+            object["emblem"] = "medallion"
+            if let out = try? JSONSerialization.data(withJSONObject: object) { try? out.write(to: current) }
+        }
         return dir
     }()
 

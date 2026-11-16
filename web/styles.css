@@ -46,7 +46,7 @@ body {
 .settings { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: 100%; }
 .stage { position: relative; display: flex; flex-direction: column; min-width: 0; padding: 20px 20px 16px; gap: 12px; }
 .stage-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.brand { font: 400 20px/1 "Didot", "Bodoni 72", serif; letter-spacing: 0.18em; text-transform: uppercase; }
+.brand { font: 400 19px/1 "Didot", "Bodoni 72", serif; letter-spacing: 0.14em; text-transform: uppercase; }
 .brand small { display: block; margin-top: 6px; font: 11px/1 -apple-system, sans-serif; letter-spacing: 0.02em; text-transform: none; color: var(--muted); }
 .preview-wrap { flex: 1; display: grid; place-items: center; min-height: 0; }
 .preview {
