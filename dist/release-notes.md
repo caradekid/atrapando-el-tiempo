@@ -13,6 +13,13 @@ A live, photorealistic watch-dial wallpaper for macOS, made by **Caradekid** as 
 
 Requires macOS 13 or later, Apple Silicon or Intel.
 
+### Windows
+
+1. Install **Lively Wallpaper** (free) from the Microsoft Store or [its website](https://www.rocksdanister.com/lively/).
+2. Download **Atrapando-el-Tiempo-Lively-….zip** below.
+3. Drag the `.zip` into Lively (or **+ Add wallpaper** → choose the file) and set it as your wallpaper.
+4. In Lively, open **Customise** on the wallpaper to pick the watch, colours, size and more. Lively can also use it as your screen saver.
+
 ---
 
 ### Instalación
@@ -27,3 +34,10 @@ Requires macOS 13 or later, Apple Silicon or Intel.
 - **macOS 13–14:** clic derecho en la app en Aplicaciones → **Abrir** → **Abrir**.
 
 Necesita macOS 13 o posterior, Apple Silicon o Intel.
+
+### Windows
+
+1. Instala **Lively Wallpaper** (gratis) desde Microsoft Store o [su web](https://www.rocksdanister.com/lively/).
+2. Descarga **Atrapando-el-Tiempo-Lively-….zip**.
+3. Arrastra el `.zip` a Lively (o **+ Añadir fondo** → elige el archivo) y ponlo como fondo.
+4. En Lively, abre **Personalizar** en el fondo para elegir reloj, colores, tamaño y más. Lively también puede usarlo como salvapantallas.

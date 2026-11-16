@@ -65,12 +65,18 @@
 
   /* ------------------------------------------------------- scene modes */
   if (mode !== 'settings') {
-    document.body.style.cursor = 'none';
+    // the screen saver hides the cursor; a wallpaper must not (on Windows it sits under the desktop)
+    if (mode === 'saver') document.body.style.cursor = 'none';
     const host = document.createElement('div');
     app.appendChild(host);
     scene = new E.Scene(host, { forceDark: boot.forceDark ?? null });
     scene.setConfig(config);
     scene.start();
+    // where the page itself receives the mouse (Lively on Windows, a browser), the light follows it;
+    // the Mac app feeds the cursor natively through TBApp.pointer instead
+    window.addEventListener('mousemove', (e) => {
+      scene.setPointer((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+    }, { passive: true });
     post({ type: 'ready', mode });
     return;
   }

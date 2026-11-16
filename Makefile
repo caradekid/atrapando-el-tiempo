@@ -7,6 +7,7 @@ SAVER    := build/AtrapandoElTiempo.saver
 APP_NAME := Atrapando el Tiempo
 VERSION  ?= 1.0.0
 DMG      := build/Atrapando-el-Tiempo-$(VERSION).dmg
+LIVELY   := build/Atrapando-el-Tiempo-Lively-$(VERSION).zip
 MIN_OS   := 13.0
 ARCHS    := arm64 x86_64
 SWIFT    := swiftc -O -swift-version 5
@@ -14,7 +15,7 @@ APP_SRC  := $(wildcard native/App/*.swift)
 SAVER_SRC:= $(wildcard native/Saver/*.swift)
 WEB      := $(wildcard web/*.js web/*.css web/index.html)
 
-.PHONY: all app saver run install install-saver dmg clean
+.PHONY: all app saver run install install-saver dmg lively clean
 
 all: app
 
@@ -73,6 +74,12 @@ dmg: app
 	cp "dist/How to open.txt" "build/dmg/How to open.txt"
 	hdiutil create -volname "$(APP_NAME)" -srcfolder build/dmg -ov -format UDZO "$(DMG)" >/dev/null
 	@echo "Built $(DMG)"
+
+# Windows: a package for Lively Wallpaper (free, Microsoft Store). Needs Node.js to build.
+lively:
+	node scripts/build-lively.mjs build/lively $(VERSION)
+	rm -f "$(LIVELY)" && cd build/lively && zip -qr "../$(notdir $(LIVELY))" .
+	@echo "Built $(LIVELY)"
 
 clean:
 	rm -rf build

@@ -71,6 +71,18 @@ The app is a free gift and isn't signed with a paid Apple certificate, so **the 
 
 You only do this once. The `.dmg` includes a short guide in English and Spanish.
 
+### Windows
+
+The same dials run on Windows through **[Lively Wallpaper](https://www.rocksdanister.com/lively/)**, a free wallpaper app (also in the Microsoft Store):
+
+1. Download **Atrapando-el-Tiempo-Lively-….zip** from the [latest release](https://github.com/caradekid/atrapando-el-tiempo/releases/latest).
+2. Drag it into Lively (or **+ Add wallpaper** → choose the file) and set it as your wallpaper.
+3. Use **Customise** in Lively to pick the watch, colours, size, emblem, light and more. Lively can also run it as a screen saver and pauses it while you play fullscreen.
+
+On Windows the typefaces fall back to built-in ones (Bahnschrift, Segoe UI, Palatino), so the lettering differs slightly from the Mac. The login-screen image is a Mac feature; on Windows you can export a PNG from `web/index.html` and set it as the lock screen.
+
+`make lively` builds the package locally (needs Node.js).
+
 ### Build from source
 
 You need the Command Line Tools (`xcode-select --install`). Full Xcode is not required.
@@ -114,6 +126,7 @@ web/            Rendering engine (Canvas 2D, no dependencies) and editor
   gl.js         GPU dial surfaces (GLSL shader)
   engine.js     Dials, printing, hands, tourbillon, channel emblem, light/dark
   app.js        Editor and native bridge
+  wallpaper.html, lively.js   Windows entry for Lively Wallpaper
 native/App      Menu bar app (Swift/AppKit + WebKit)
 native/Saver    Screen saver (ScreenSaver.framework + WebKit)
 scripts/        render.swift: renders PNG/HEIC without touching the desktop

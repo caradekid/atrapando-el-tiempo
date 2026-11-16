@@ -79,13 +79,13 @@
   };
 
   const FONTS = {
-    didot:       { name: 'Didot',        css: '"Didot","Bodoni 72",serif' },
-    bodoni:      { name: 'Bodoni',       css: '"Bodoni 72","Didot",serif' },
-    baskerville: { name: 'Baskerville',  css: 'Baskerville,"Times New Roman",serif' },
-    optima:      { name: 'Optima',       css: 'Optima,"Avenir Next",sans-serif' },
-    futura:      { name: 'Futura',       css: 'Futura,"Avenir Next",sans-serif' },
-    avenir:      { name: 'Avenir',       css: '"Avenir Next","Helvetica Neue",sans-serif' },
-    copperplate: { name: 'Copperplate',  css: 'Copperplate,"Didot",serif' },
+    didot:       { name: 'Didot',        css: '"Didot","Bodoni 72","Bodoni MT","Palatino Linotype",Georgia,serif' },
+    bodoni:      { name: 'Bodoni',       css: '"Bodoni 72","Didot","Bodoni MT","Palatino Linotype",serif' },
+    baskerville: { name: 'Baskerville',  css: 'Baskerville,"Baskerville Old Face","Palatino Linotype","Times New Roman",serif' },
+    optima:      { name: 'Optima',       css: 'Optima,Candara,"Segoe UI","Avenir Next",sans-serif' },
+    futura:      { name: 'Futura',       css: 'Futura,"Century Gothic",Bahnschrift,"Avenir Next",sans-serif' },
+    avenir:      { name: 'Avenir',       css: '"Avenir Next","Segoe UI","Helvetica Neue",sans-serif' },
+    copperplate: { name: 'Copperplate',  css: 'Copperplate,"Copperplate Gothic Light","Didot","Palatino Linotype",serif' },
   };
 
   // Style families inspired by the great classics. No brand names, logos or trade dress.
@@ -589,7 +589,7 @@
     ctx.textBaseline = 'middle';
 
     if (model.bezel === 'diver') {
-      ctx.font = `600 ${fs}px "Avenir Next","Helvetica Neue",sans-serif`;
+      ctx.font = `600 ${fs}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
       for (let m = 0; m < 60; m++) {
         const a = (m / 60) * TAU;
         ctx.save();
@@ -615,7 +615,7 @@
         ctx.restore();
       }
     } else if (model.bezel === 'gmt') {
-      ctx.font = `600 ${fs * 0.9}px "Avenir Next","Helvetica Neue",sans-serif`;
+      ctx.font = `600 ${fs * 0.9}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
       for (let h = 0; h < 24; h++) {
         const a = (h / 24) * TAU;
         ctx.save();
@@ -639,7 +639,7 @@
       const pos = (v) => Math.log10(v / 10) * TAU;
       const labels = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90];
       for (const [row, rr, size] of [[0, mid + fs * 0.42, 0.42], [1, mid - fs * 0.5, 0.36]]) {
-        ctx.font = `500 ${fs * size}px "Avenir Next Condensed","Avenir Next",sans-serif`;
+        ctx.font = `500 ${fs * size}px "Avenir Next Condensed",Bahnschrift,"Avenir Next",sans-serif`;
         labels.forEach((v) => {
           ctx.save();
           ctx.rotate(pos(v));
@@ -664,7 +664,7 @@
       ctx.stroke();
     } else if (model.bezel === 'compressor') {
       // inner rotating scale of a vintage super-compressor diver
-      ctx.font = `600 ${fs * 0.75}px Futura,"Avenir Next",sans-serif`;
+      ctx.font = `600 ${fs * 0.75}px Futura,"Century Gothic",Bahnschrift,"Avenir Next",sans-serif`;
       for (let m = 0; m < 60; m++) {
         const a = (m / 60) * TAU;
         ctx.save();
@@ -692,7 +692,7 @@
       ctx.stroke();
     } else {
       // tachymeter
-      ctx.font = `500 ${fs * 0.62}px "Avenir Next","Helvetica Neue",sans-serif`;
+      ctx.font = `500 ${fs * 0.62}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
       const vals = [500, 400, 300, 250, 200, 180, 160, 140, 120, 110, 100, 90, 80, 70, 65, 60];
       vals.forEach((v) => {
         const a = (3600 / v / 60) * TAU;
@@ -1242,7 +1242,7 @@
           const p = polar(Rd * 0.8, a);
           ctx.save();
           ctx.fillStyle = dial.ink;
-          ctx.font = `700 ${Rd * 0.13}px Futura,"Avenir Next",sans-serif`;
+          ctx.font = `700 ${Rd * 0.13}px Futura,"Century Gothic",Bahnschrift,"Avenir Next",sans-serif`;
           ctx.fillText(String(h === 0 ? 12 : h), p.x, p.y + Rd * 0.008);
           ctx.restore();
           continue;
@@ -1312,7 +1312,7 @@
         ctx.save();
         ctx.fillStyle = env.lumeGlow ? env.lume : dial.ink;
         if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = Rd * 0.04 * ctxScale(ctx); }
-        ctx.font = `700 ${Rd * 0.15}px "DIN Alternate","Avenir Next",sans-serif`;
+        ctx.font = `700 ${Rd * 0.15}px "DIN Alternate",Bahnschrift,"Avenir Next",sans-serif`;
         ctx.fillText(String(h === 0 ? 12 : h), p.x, p.y + Rd * 0.008);
         noShadow(ctx);
         const q = polar(Rd * 0.6, a);
@@ -1321,7 +1321,7 @@
         const nearEmblem = h === 0 && env.cfg.emblem !== 'none';
         if (!nearDate && !nearEmblem && !blocked(g, q, Rd * 0.03)) {
           ctx.fillStyle = rgba(dial.ink, 0.85);
-          ctx.font = `600 ${Rd * 0.058}px "DIN Alternate","Avenir Next",sans-serif`;
+          ctx.font = `600 ${Rd * 0.058}px "DIN Alternate",Bahnschrift,"Avenir Next",sans-serif`;
           ctx.fillText(String(h === 0 ? 24 : h + 12), q.x, q.y);
         }
         ctx.restore();
@@ -1342,7 +1342,7 @@
           const p = polar(Rd * 0.8, a);
           if (dateHides(env, h)) continue;
           ctx.save();
-          ctx.font = `700 ${Rd * 0.17}px "DIN Alternate","Avenir Next",sans-serif`;
+          ctx.font = `700 ${Rd * 0.17}px "DIN Alternate",Bahnschrift,"Avenir Next",sans-serif`;
           castShadow(ctx, env.dark ? 'rgba(0,0,0,0.65)' : 'rgba(30,20,10,0.32)', Rd * 0.02, Rd * 0.012);
           ctx.lineJoin = 'round';
           ctx.lineWidth = Rd * 0.016;
@@ -1384,7 +1384,7 @@
         ctx.fillStyle = env.lumeGlow ? env.lume : dial.ink;
         ctx.save();
         if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = Rd * 0.04; }
-        ctx.font = `700 ${Rd * 0.16}px "DIN Alternate","Avenir Next",sans-serif`;
+        ctx.font = `700 ${Rd * 0.16}px "DIN Alternate",Bahnschrift,"Avenir Next",sans-serif`;
         ctx.fillText(String(h), p.x, p.y + Rd * 0.008);
         ctx.restore();
       }
@@ -1583,7 +1583,7 @@
     ctx.fillStyle = ink;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = `600 ${h * 0.72}px "Helvetica Neue","Avenir Next",sans-serif`;
+    ctx.font = `600 ${h * 0.72}px "Helvetica Neue","Segoe UI","Avenir Next",sans-serif`;
     if (d.day) {
       const dow = env.date.getDay();
       ctx.fillStyle = dow === 0 ? '#c8202c' : dow === 6 ? '#1f63c4' : ink;
@@ -1614,7 +1614,7 @@
     ctx.fillStyle = env.lightDial || env.model.sport || env.model.cyclops ? '#f9f8f4' : mix(env.dial.b, '#000000', 0.2);
     ctx.fillRect(x - lw / 2, -lh / 2, lw, lh);
     ctx.fillStyle = luminance(ctx.fillStyle) > 0.5 ? '#141416' : '#f4f2ec';
-    ctx.font = `600 ${d.h * 0.72 * 2.1}px "Helvetica Neue","Avenir Next",sans-serif`;
+    ctx.font = `600 ${d.h * 0.72 * 2.1}px "Helvetica Neue","Segoe UI","Avenir Next",sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(String(env.date.getDate()), x, d.h * 0.1);
@@ -1650,11 +1650,11 @@
     }
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = `500 ${pr.r * 0.16}px "Avenir Next","Helvetica Neue",sans-serif`;
+    ctx.font = `500 ${pr.r * 0.16}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
     const lo = polar(pr.r * 1.18, a0), hi = polar(pr.r * 1.18, a1);
     ctx.fillText('0', lo.x, lo.y);
     ctx.fillText('72', hi.x, hi.y);
-    ctx.font = `600 ${pr.r * 0.13}px "Avenir Next","Helvetica Neue",sans-serif`;
+    ctx.font = `600 ${pr.r * 0.13}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
     spacedText(ctx, 'POWER RESERVE', 0, pr.r * 0.32, pr.r * 0.02);
     ctx.restore();
   }
@@ -1697,7 +1697,7 @@
       ctx.lineWidth = s.r * (major ? 0.03 : 0.016);
       ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
     }
-    ctx.font = env.model.sport ? `600 ${s.r * 0.2}px "Avenir Next","Helvetica Neue",sans-serif` : `400 ${s.r * 0.22}px ${env.font}`;
+    ctx.font = env.model.sport ? `600 ${s.r * 0.2}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif` : `400 ${s.r * 0.22}px ${env.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const labels = s.kind === '24h' ? [[24, 0], [6, 0.25], [12, 0.5], [18, 0.75]]
