@@ -46,7 +46,7 @@ All dials are procedural (no image files): textures computed pixel by pixel with
 | 🇪🇸 Spain | **Racing Chrono** | Racing chronograph, colour registers, quartz tick |
 | 🇪🇸 Spain | **Mediterráneo** | Vintage *compressor* diver with an inner scale and orange accents |
 
-**Customisable:** channel emblem (medallion, printed or off), dial colour (day and night), metal of the hands and indices, outer ring colour, date, central seconds, tourbillon (on any dial), lume, signature text and typeface, background (studio, spotlight, solid) with light/dark colours, position, size and frame rate (60/30/15 fps to save battery).
+**Customisable:** channel emblem (medallion, printed or off), dial colour (day and night), metal of the hands and indices, outer ring colour, date, central seconds, tourbillon (on any dial), lume, signature text and typeface, background (studio, spotlight, solid) with light/dark colours, position, size (very small, small, medium or large) and frame rate (60/30/15 fps to save battery).
 
 > The designs are *inspired by* well-known styles. They do not reproduce watch brand names or logos. The signature defaults to *ATRAPANDO EL TIEMPO · x Caradekid* and you can change it.
 

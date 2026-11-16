@@ -222,11 +222,15 @@
     const fpsSeg = segmented('fps', [[60, 'Smooth'], [30, 'Balanced'], [15, 'Eco']]);
     const bgLight = h('input', { type: 'color', oninput: (e) => update({ bgLight: e.target.value }), 'aria-label': 'Light background' });
     const bgDark = h('input', { type: 'color', oninput: (e) => update({ bgDark: e.target.value }), 'aria-label': 'Dark background' });
-    const size = h('input', { type: 'range', min: 0.25, max: 0.85, step: 0.01, oninput: (e) => update({ size: Number(e.target.value) }), 'aria-label': 'Watch size' });
+    // watch diameter as a share of the screen height
+    const SIZES = [[0.28, 'Very small'], [0.38, 'Small'], [0.5, 'Medium'], [0.66, 'Large']];
+    const sizeSeg = segmented('size', SIZES);
+    sizeSeg.classList.add('seg-full');
     syncs.push((c) => {
       appearanceSeg._sync(c.appearance); bgSeg._sync(c.background); posSeg._sync(c.position); fpsSeg._sync(c.fps);
       bgLight.value = c.bgLight; bgDark.value = c.bgDark;
-      if (document.activeElement !== size) size.value = c.size;
+      const near = SIZES.reduce((best, [v]) => (Math.abs(v - c.size) < Math.abs(best - c.size) ? v : best), SIZES[0][0]);
+      sizeSeg._sync(near);
     });
 
     // actions
@@ -278,7 +282,8 @@
         row('Background', bgSeg),
         row('Light / dark colour', h('span', { class: 'row', style: 'gap:8px' }, bgLight, bgDark)),
         row('Position', posSeg),
-        row('Size', size),
+        h('div', { class: 'sub-label' }, 'Watch size'),
+        sizeSeg,
         row('Frame rate', fpsSeg)),
       section(isNative ? 'Mac' : 'Export', actions),
       section('', resetBtn));
