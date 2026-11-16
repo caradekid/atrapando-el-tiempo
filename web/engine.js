@@ -2336,34 +2336,56 @@
   }
 
   /* -------------------------------------------------------------- background */
+  // The scene behind the watch, computed per pixel: smooth radial light, triangular
+  // dithering so dark gradients never band, and a fine monochrome film grain for texture.
   function drawBackground(ctx, w, h, cfg, dark, cx, cy, R) {
     if (cfg.background === 'none') { ctx.clearRect(0, 0, w, h); return; }
-    const base = dark ? cfg.bgDark : cfg.bgLight;
-    ctx.fillStyle = base;
-    ctx.fillRect(0, 0, w, h);
+    const k = ctxScale(ctx);
+    const W = Math.max(1, Math.round(w * k)), H = Math.max(1, Math.round(h * k));
+    const base = hexToRgb(dark ? cfg.bgDark : cfg.bgLight);
+    const hex = dark ? cfg.bgDark : cfg.bgLight;
+    let inner = base, outer = base, mid = 0.55, ox = cx * k, oy = cy * k, r0 = 0, r1 = 1;
     const far = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy));
     if (cfg.background === 'studio') {
-      const gr = ctx.createRadialGradient(cx, cy - R * 0.3, R * 0.2, cx, cy, far);
-      gr.addColorStop(0, mix(base, '#ffffff', dark ? 0.07 : 0.35));
-      gr.addColorStop(0.55, base);
-      gr.addColorStop(1, mix(base, '#000000', dark ? 0.35 : 0.1));
-      ctx.fillStyle = gr;
-      ctx.fillRect(0, 0, w, h);
+      inner = hexToRgb(mix(hex, '#ffffff', dark ? 0.07 : 0.35));
+      outer = hexToRgb(mix(hex, '#000000', dark ? 0.35 : 0.1));
+      oy = (cy - R * 0.12) * k; r0 = R * 0.2 * k; r1 = far * k;
     } else if (cfg.background === 'spotlight') {
-      const gr = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R * 3.2);
-      gr.addColorStop(0, mix(base, '#ffffff', dark ? 0.1 : 0.4));
-      gr.addColorStop(1, mix(base, '#000000', dark ? 0.6 : 0.25));
-      ctx.fillStyle = gr;
-      ctx.fillRect(0, 0, w, h);
+      inner = hexToRgb(mix(hex, '#ffffff', dark ? 0.1 : 0.4));
+      outer = hexToRgb(mix(hex, '#000000', dark ? 0.6 : 0.25));
+      r0 = R * 0.6 * k; r1 = R * 3.2 * k; mid = -1;
     }
-    // film grain avoids banding on large gradients
-    ctx.save();
-    ctx.globalAlpha = dark ? 0.035 : 0.025;
-    ctx.globalCompositeOperation = 'overlay';
-    ctx.fillStyle = noisePattern(ctx);
-    ctx.fillRect(0, 0, w, h);
-    ctx.restore();
+    const flat = cfg.background === 'solid';
+    const img = ctx.createImageData(W, H);
+    const data = img.data;
+    const span = Math.max(1, r1 - r0);
+    const grain = dark ? 3.4 : 2.6;       // ± levels: removes banding and reads as fine texture
+    for (let y = 0; y < H; y++) {
+      const dy = y + 0.5 - oy, dy2 = dy * dy;
+      let o = y * W * 4;
+      for (let x = 0; x < W; x++, o += 4) {
+        let r, g, b;
+        if (flat) { r = base[0]; g = base[1]; b = base[2]; }
+        else {
+          const dx = x + 0.5 - ox;
+          const t = Math.min(1, Math.max(0, (Math.sqrt(dx * dx + dy2) - r0) / span));
+          if (mid < 0) {
+            r = inner[0] + (outer[0] - inner[0]) * t; g = inner[1] + (outer[1] - inner[1]) * t; b = inner[2] + (outer[2] - inner[2]) * t;
+          } else if (t < mid) {
+            const u = t / mid;
+            r = inner[0] + (base[0] - inner[0]) * u; g = inner[1] + (base[1] - inner[1]) * u; b = inner[2] + (base[2] - inner[2]) * u;
+          } else {
+            const u = (t - mid) / (1 - mid);
+            r = base[0] + (outer[0] - base[0]) * u; g = base[1] + (outer[1] - base[1]) * u; b = base[2] + (outer[2] - base[2]) * u;
+          }
+        }
+        const n = (hash2(x, y) + hash2(x + 7919, y + 104729) - 1) * grain;   // triangular dither, same on all channels
+        data[o] = r + n; data[o + 1] = g + n; data[o + 2] = b + n; data[o + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
   }
+
 
   function layout(cfg, w, h) {
     const R = (cfg.size * Math.min(w, h)) / 2;
@@ -2476,8 +2498,17 @@
       bg.style.width = w + 'px'; bg.style.height = h + 'px';
       bg.width = Math.round(w * this.dpr); bg.height = Math.round(h * this.dpr);
       const b = bg.getContext('2d');
+      const bgKey = [w, h, this.dpr, dark, this.cfg.background, this.cfg.bgLight, this.cfg.bgDark, cx, cy, R].join('|');
+      if (bgKey !== this._bgKey) {
+        this._bgCache = document.createElement('canvas');
+        this._bgCache.width = bg.width; this._bgCache.height = bg.height;
+        const cc = this._bgCache.getContext('2d');
+        cc.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+        drawBackground(cc, w, h, this.cfg, dark, cx, cy, R);
+        this._bgKey = bgKey;
+      }
+      b.drawImage(this._bgCache, 0, 0);
       b.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-      drawBackground(b, w, h, this.cfg, dark, cx, cy, R);
       this.glKind = gpuReady(this.env.model.texture) ? this.env.model.texture : null;
       this.env.glDial = !!this.glKind;
       b.save();
