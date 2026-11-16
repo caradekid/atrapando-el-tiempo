@@ -102,31 +102,31 @@
     },
     birch: {
       name: 'Birch', origin: 'Japan', note: 'Vertical bark relief, razor-sharp hands',
-      bezel: 'none', texture: 'birch', indices: 'faceted', hands: 'faceted', secondsHand: 'needle',
+      bezel: 'none', texture: 'birch', indices: 'faceted', hands: 'faceted', secondsHand: 'polishedNeedle', rehaut: true,
       motion: 'beat8', dateAt: 3,
       defaults: { dial: 'birch', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'slate' },
     },
     cocktail: {
       name: 'Cocktail', origin: 'Japan', note: 'Radial sunray grooves, dauphine hands',
-      bezel: 'none', texture: 'cocktail', indices: 'baton', hands: 'dauphine', secondsHand: 'needle',
+      bezel: 'none', texture: 'cocktail', indices: 'baton', hands: 'dauphine', secondsHand: 'polishedNeedle', longIndices: true,
       motion: 'beat6', dateAt: 3,
       defaults: { dial: 'sky', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
     },
     shellDiver: {
       name: 'Shell Diver', origin: 'Japan', note: 'Big lume plots, day-date, dive scale',
-      bezel: 'diver', texture: 'matte', indices: 'bigdots', hands: 'arrow', secondsHand: 'lollipop',
+      bezel: 'diver', texture: 'matte', indices: 'bigdots', hands: 'arrow', secondsHand: 'lollipop', whiteSeconds: true, rehaut: true,
       motion: 'beat6', dateAt: 3, dayDate: true, sport: true,
       defaults: { dial: 'black', material: 'steel', bezel: 'black', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
     },
     submersible: {
       name: 'Submersible', origin: 'Switzerland', note: 'Gloss dial, round plots, 60-minute scale',
-      bezel: 'diver', texture: 'gloss', indices: 'dots', hands: 'sword', secondsHand: 'lollipop',
+      bezel: 'diver', texture: 'gloss', indices: 'dots', hands: 'sword', secondsHand: 'lollipop', whiteSeconds: true,
       motion: 'beat8', dateAt: 3, cyclops: true, sport: true,
       defaults: { dial: 'black', material: 'steel', bezel: 'black', tourbillon: false, centralSeconds: true, date: false, nightDial: 'same' },
     },
     gmt: {
       name: 'GMT', origin: 'Switzerland', note: 'Second time zone on a two-tone 24 h scale',
-      bezel: 'gmt', texture: 'gloss', indices: 'dots', hands: 'sword', secondsHand: 'lollipop', gmt: true,
+      bezel: 'gmt', texture: 'gloss', indices: 'dots', hands: 'sword', secondsHand: 'lollipop', whiteSeconds: true, gmt: true,
       motion: 'beat8', dateAt: 3, cyclops: true, sport: true,
       defaults: { dial: 'black', material: 'steel', bezel: 'redblue', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
     },
@@ -138,7 +138,7 @@
     },
     datum: {
       name: 'Datum', origin: 'Switzerland', note: 'Sunburst dial, date under a magnifier',
-      bezel: 'none', texture: 'sunray', indices: 'baton', hands: 'baton', secondsHand: 'needle',
+      bezel: 'none', texture: 'sunray', indices: 'baton', hands: 'baton', secondsHand: 'polishedNeedle',
       motion: 'beat8', dateAt: 3, cyclops: true,
       defaults: { dial: 'blue', material: 'whitegold', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
     },
@@ -150,7 +150,7 @@
     },
     octagon: {
       name: 'Octagon', origin: 'Switzerland', note: 'Tapisserie grid, integrated-sport spirit',
-      bezel: 'none', texture: 'tapisserie', indices: 'baton', hands: 'baton', secondsHand: 'needle',
+      bezel: 'none', texture: 'tapisserie', indices: 'baton', hands: 'baton', secondsHand: 'polishedNeedle', rehaut: true,
       motion: 'beat8', dateAt: 3, sport: true,
       defaults: { dial: 'blue', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
     },
@@ -162,7 +162,7 @@
     },
     pilot: {
       name: 'Pilot', origin: 'Switzerland', note: 'Big aviation numerals, blued hands',
-      bezel: 'none', texture: 'matte', indices: 'arabic', hands: 'pilot', secondsHand: 'needle',
+      bezel: 'none', texture: 'matte', indices: 'arabic', hands: 'pilot', secondsHand: 'needle', whiteSeconds: true,
       motion: 'beat8', sport: true,
       defaults: { dial: 'black', material: 'titanium', tourbillon: false, centralSeconds: true, nightDial: 'same' },
     },
@@ -243,7 +243,7 @@
     const model = MODELS[cfg.model];
     const dialId = dark && cfg.nightDial !== 'same' ? cfg.nightDial : cfg.dial;
     const dial = Object.assign({}, DIALS[dialId]);
-    if (!dial.sub) dial.sub = mix(dial.b, luminance(dial.a) > 0.5 ? '#000000' : '#ffffff', 0.06);
+    if (!dial.sub) dial.sub = mix(mix(dial.a, dial.b, 0.5), luminance(dial.a) > 0.5 ? '#000000' : '#ffffff', model.sport ? 0.06 : 0.025);
     const mat = envMaterial(MATERIALS[cfg.material], dark);
     const lightDial = luminance(dial.a) > 0.5;
     const lumeGlow = dark && cfg.lume;
@@ -638,7 +638,7 @@
     birch(u, v, r, th, ctx) {
       // vertical bark: sharp ridged grooves that wander and break, lit from the side
       const h = (x, y) => {
-        const warp = (fbm(y * 0.035, x * 0.012, 3) - 0.5) * 14;
+        const warp = (fbm(y * 0.03, x * 0.012, 3) - 0.5) * 6;
         const n = fbm(x + warp, y * 0.025, 4);
         const ridge = 1 - Math.abs(n * 2 - 1);
         return ridge * ridge;
@@ -1054,7 +1054,7 @@
       const style = model.indices;
       if (style === 'baton' || style === 'faceted' || style === 'sport') {
         const faceted = style === 'faceted';
-        const r1 = Rd * (model.rehaut ? 0.69 : model.subdials ? 0.83 : faceted ? 0.74 : 0.78), r2 = Rd * (model.rehaut ? 0.875 : 0.91);
+        const r1 = Rd * (model.rehaut ? 0.69 : model.longIndices ? 0.7 : model.subdials ? 0.83 : faceted ? 0.74 : 0.78), r2 = Rd * (model.rehaut ? 0.875 : 0.91);
         const mid = polar((r1 + r2) / 2, a);
         if (blocked(g, mid, margin)) continue;
         if (model.dateAt === 3 && env.cfg.date && h === 3) continue;
@@ -1319,7 +1319,7 @@
     ctx.fill();
     ctx.beginPath();
     ctx.roundRect(x - w / 2, -h / 2, w, h, Rd * 0.006);
-    const disc = env.lightDial || env.model.sport ? '#f9f8f4' : mix(dial.b, '#000000', 0.2);
+    const disc = env.lightDial || env.model.sport || env.model.cyclops ? '#f9f8f4' : mix(dial.b, '#000000', 0.2);
     const ig = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
     ig.addColorStop(0, mix(disc, '#000000', 0.22));
     ig.addColorStop(0.28, disc);
@@ -1357,7 +1357,7 @@
     ctx.save();
     ctx.clip();
     // magnified date: 2.5x
-    ctx.fillStyle = env.lightDial || env.model.sport ? '#f9f8f4' : mix(env.dial.b, '#000000', 0.2);
+    ctx.fillStyle = env.lightDial || env.model.sport || env.model.cyclops ? '#f9f8f4' : mix(env.dial.b, '#000000', 0.2);
     ctx.fillRect(x - lw / 2, -lh / 2, lw, lh);
     ctx.fillStyle = luminance(ctx.fillStyle) > 0.5 ? '#141416' : '#f4f2ec';
     ctx.font = `600 ${d.h * 0.72 * 2.1}px "Helvetica Neue","Avenir Next",sans-serif`;
@@ -1443,7 +1443,7 @@
       ctx.lineWidth = s.r * (major ? 0.03 : 0.016);
       ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
     }
-    ctx.font = `600 ${s.r * 0.2}px "Avenir Next","Helvetica Neue",sans-serif`;
+    ctx.font = env.model.sport ? `600 ${s.r * 0.2}px "Avenir Next","Helvetica Neue",sans-serif` : `400 ${s.r * 0.22}px ${env.font}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const labels = s.kind === '24h' ? [[24, 0], [6, 0.25], [12, 0.5], [18, 0.75]]
@@ -1782,6 +1782,7 @@
       },
       finish: 'blued',
     }),
+    polishedNeedle: (L, W) => Object.assign(HANDS.bluedNeedle(L, W), { finish: 'facets' }),
     needle: (L, W) => ({
       path(c) { c.roundRect(-W * 0.5, -L, W, L * 1.25, W * 0.5); c.moveTo(W * 2, L * 0.2); c.arc(0, L * 0.2, W * 2, 0, TAU); },
       finish: 'accent',
@@ -1893,7 +1894,8 @@
       ctx.translate(s.x, s.y);
       const a = s.kind === '24h' ? ((t.h + t.m / 60) / 24) * TAU : s.kind === 'min' ? (((t.m % 30) + t.s / 60) / 30) * TAU
         : s.kind === 'hour' ? (((t.h % 12) + t.m / 60) / 12) * TAU : sA;
-      drawHand(ctx, env, 'sub', s.r * 0.85, s.r * 0.07, a, 0.3);
+      if (env.model.sport) drawHand(ctx, env, 'sub', s.r * 0.85, s.r * 0.07, a, 0.3);
+      else drawHand(ctx, env, 'polishedNeedle', s.r * 0.85, s.r * 0.07, a, 0.3);
       circle(ctx, 0, 0, s.r * 0.08);
       ctx.fillStyle = metalConic(ctx, 0, 0, env.mat);
       ctx.fill();
@@ -1903,7 +1905,8 @@
       const s = g.smallSeconds;
       ctx.save();
       ctx.translate(s.x, s.y);
-      drawHand(ctx, env, 'sub', s.r * 0.85, s.r * 0.06, sA, 0.3);
+      if (env.model.sport) drawHand(ctx, env, 'sub', s.r * 0.85, s.r * 0.06, sA, 0.3);
+      else drawHand(ctx, env, 'polishedNeedle', s.r * 0.88, s.r * 0.065, sA, 0.3);
       circle(ctx, 0, 0, s.r * 0.07);
       ctx.fillStyle = metalConic(ctx, 0, 0, env.mat);
       ctx.fill();
@@ -1936,11 +1939,12 @@
     ctx.save();
     castShadow(ctx, env.dark ? 'rgba(0,0,0,0.6)' : 'rgba(30,20,10,0.3)', Rd * 0.012, Rd * 0.008);
     circle(ctx, 0, 0, Rd * 0.036);
-    ctx.fillStyle = showCentral ? env.accent : metalConic(ctx, 0, 0, env.mat, 0.4);
+    const paintedCap = showCentral && model.secondsHand !== 'polishedNeedle';
+    ctx.fillStyle = paintedCap ? env.accent : metalConic(ctx, 0, 0, env.mat, 0.4);
     ctx.fill();
     noShadow(ctx);
     circle(ctx, 0, 0, Rd * 0.026);
-    ctx.fillStyle = showCentral ? mix(env.accent, '#000000', 0.15) : metalConic(ctx, 0, 0, env.mat, -1.2);
+    ctx.fillStyle = paintedCap ? mix(env.accent, '#000000', 0.15) : metalConic(ctx, 0, 0, env.mat, -1.2);
     ctx.fill();
     circle(ctx, 0, 0, Rd * 0.009);
     ctx.fillStyle = metalConic(ctx, 0, 0, MATERIALS.steel, 0.8);
