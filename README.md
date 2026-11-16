@@ -2,7 +2,7 @@
 
 <p align="center"><img src="assets/icon-1024.png" width="140" alt="Dial with the Atrapando el tiempo medallion"></p>
 
-A gift from **Caradekid** to the **Atrapando el tiempo** channel and its community. Every dial carries an applied medallion: a polished bezel and charcoal enamel showing the **AET** monogram with the channel's red dot. It can also show the channel logo, redrawn as vectors so it stays sharp at any size.
+A gift from **Caradekid** to the **Atrapando el tiempo** channel and its community. Every dial carries the channel emblem as an applied medallion: a polished bezel, charcoal enamel and the mark with its red dot, redrawn as vectors so it stays sharp at any size.
 
 **Live watch-dial wallpaper for macOS.** Photorealistic dials inspired by the great Japanese, Swiss and Spanish classics, showing your Mac's real time. Works 100 % offline, follows Light and Dark mode, and also covers the **login screen**, the **lock screen** and the **screen saver**.
 
@@ -46,7 +46,7 @@ All dials are procedural (no image files): textures computed pixel by pixel with
 | 🇪🇸 Spain | **Racing Chrono** | Racing chronograph, colour registers, quartz tick |
 | 🇪🇸 Spain | **Mediterráneo** | Vintage *compressor* diver with an inner scale and orange accents |
 
-**Customisable:** channel emblem (AET monogram, logo, printed or off), dial colour (day and night), metal of the hands and indices, outer ring colour, date, central seconds, tourbillon (on any dial), lume, signature text and typeface, background (studio, spotlight, solid) with light/dark colours, position, size (very small, small, medium or large) and frame rate (60/30/15 fps to save battery).
+**Customisable:** channel emblem (medallion, printed or off), dial colour (day and night), metal of the hands and indices, outer ring colour, date, central seconds, tourbillon (on any dial), lume, signature text and typeface, background (studio, spotlight, solid) with light/dark colours, position, size (very small, small, medium or large) and frame rate (60/30/15 fps to save battery).
 
 > The designs are *inspired by* well-known styles. They do not reproduce watch brand names or logos. The signature defaults to *ATRAPANDO EL TIEMPO · x Caradekid* and you can change it.
 

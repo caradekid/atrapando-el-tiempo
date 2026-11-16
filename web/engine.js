@@ -198,8 +198,7 @@
     centralSeconds: true,
     date: true,
     lume: true,
-    emblem: 'monogram',
-    emblemText: 'AET',
+    emblem: 'medallion',
     wordmark: 'ATRAPANDO EL TIEMPO',
     subline: 'x Caradekid',
     font: 'didot',
@@ -220,8 +219,7 @@
     if (!MATERIALS[c.material]) c.material = DEFAULTS.material;
     if (!BEZELS[c.bezel]) c.bezel = DEFAULTS.bezel;
     if (!FONTS[c.font]) c.font = DEFAULTS.font;
-    if (!['monogram', 'medallion', 'printedText', 'printed', 'none'].includes(c.emblem)) c.emblem = DEFAULTS.emblem;
-    c.emblemText = String(c.emblemText ?? DEFAULTS.emblemText).slice(0, 5);
+    if (!['medallion', 'printed', 'none'].includes(c.emblem)) c.emblem = DEFAULTS.emblem;
     c.size = clamp(Number(c.size) || DEFAULTS.size, 0.2, 0.9);
     c.fps = Number(c.fps) === 30 ? 30 : Number(c.fps) === 15 ? 15 : 60;
     c.wordmark = String(c.wordmark ?? '').slice(0, 24);
@@ -1048,22 +1046,6 @@
     ctx.restore();
   }
 
-  // Initials set in the signature typeface, with the channel's red dot beneath them.
-  function drawMonogram(ctx, env, m, ink) {
-    const text = (env.cfg.emblemText || 'AET').toUpperCase();
-    ctx.save();
-    ctx.fillStyle = ink;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const size = fitFont(ctx, text, 400, m * 0.78, env.font, m * 0.08, m * 1.5);
-    spacedText(ctx, text, 0, -m * 0.08, size * 0.1);
-    ctx.shadowColor = 'transparent';
-    circle(ctx, 0, m * 0.5, m * 0.075);
-    ctx.fillStyle = EMBLEM.red;
-    ctx.fill();
-    ctx.restore();
-  }
-
   function emblemCenter(env, g) {
     return { x: 0, y: -g.Rd * (env.model.subdials ? 0.5 : 0.48) };
   }
@@ -1078,11 +1060,6 @@
     ctx.translate(c.x, c.y);
     if (mode === 'printed') {
       drawLogo(ctx, m * 1.7, env.dial.ink, EMBLEM.red);
-      ctx.restore();
-      return;
-    }
-    if (mode === 'printedText') {
-      drawMonogram(ctx, env, m, env.dial.ink);
       ctx.restore();
       return;
     }
@@ -1116,8 +1093,7 @@
     ctx.shadowColor = 'rgba(0,0,0,0.6)';
     ctx.shadowBlur = m * 0.06;
     ctx.shadowOffsetY = m * 0.03;
-    if (mode === 'monogram') drawMonogram(ctx, env, m, '#f4f3ef');
-    else drawLogo(ctx, m * 1.48, '#f4f3ef', EMBLEM.red);
+    drawLogo(ctx, m * 1.48, '#f4f3ef', EMBLEM.red);
     ctx.restore();
     // glaze highlight
     ctx.save();
