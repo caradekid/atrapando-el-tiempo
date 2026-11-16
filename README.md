@@ -29,7 +29,7 @@ A gift from **Caradekid** to the **Atrapando el tiempo** channel and its communi
 
 ## Collection
 
-All dials are procedural (no image files): textures computed pixel by pixel with directional light, faceted indices and hands, drop shadows, a sapphire crystal with reflection, and the seconds motion of each type of movement.
+All dials are procedural (no image files). Dial surfaces are rendered on the GPU (WebGL): relief, anisotropic brushed metal on sunray finishes, glints in the snow and a softbox in gloss lacquer, all lit live and shifting as you move the cursor (with an automatic CPU fallback). On top: faceted indices and hands, drop shadows, a sapphire crystal with reflection, and the seconds motion of each type of movement.
 
 | Origin | Dial | Signature details |
 | --- | --- | --- |
@@ -90,7 +90,8 @@ Open `web/index.html` in a browser to design your dial and download it as a PNG 
 
 ```
 web/            Rendering engine (Canvas 2D, no dependencies) and editor
-  engine.js     Dials, textures, hands, tourbillon, channel emblem, light/dark
+  gl.js         GPU dial surfaces (GLSL shader)
+  engine.js     Dials, printing, hands, tourbillon, channel emblem, light/dark
   app.js        Editor and native bridge
 native/App      Menu bar app (Swift/AppKit + WebKit)
 native/Saver    Screen saver (ScreenSaver.framework + WebKit)

@@ -27,7 +27,7 @@ $(SAVER): $(SAVER_SRC) native/Saver/Info.plist $(WEB)
 	done
 	lipo -create $(foreach a,$(ARCHS),build/obj/saver-$(a)) -output $@/Contents/MacOS/AtrapandoElTiempo
 	cp native/Saver/Info.plist $@/Contents/Info.plist
-	cp web/index.html web/engine.js web/app.js web/styles.css $@/Contents/Resources/web/
+	cp web/index.html web/gl.js web/engine.js web/app.js web/styles.css $@/Contents/Resources/web/
 	[ -f assets/thumbnail.png ] && cp assets/thumbnail*.png $@/Contents/Resources/ || true
 	echo '{}' > $@/Contents/Resources/config.json
 
@@ -40,7 +40,7 @@ $(APP): $(APP_SRC) native/App/Info.plist $(WEB) $(SAVER)
 	done
 	lipo -create $(foreach a,$(ARCHS),build/obj/app-$(a)) -output $@/Contents/MacOS/AtrapandoElTiempo
 	cp native/App/Info.plist $@/Contents/Info.plist
-	cp web/index.html web/engine.js web/app.js web/styles.css $@/Contents/Resources/web/
+	cp web/index.html web/gl.js web/engine.js web/app.js web/styles.css $@/Contents/Resources/web/
 	[ -f assets/AppIcon.icns ] && cp assets/AppIcon.icns $@/Contents/Resources/ || true
 	cp -R $(SAVER) $@/Contents/Resources/
 	codesign --force --sign - $@ >/dev/null 2>&1 || true

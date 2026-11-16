@@ -821,6 +821,16 @@
   };
 
   const textureCache = new Map();
+
+  // GPU dial surfaces (web/gl.js), lit with the engine's current light.
+  function gpuReady(kind) {
+    const G = root.TourbillonGL;
+    return !!(G && G.available && G.kinds.includes(kind));
+  }
+  function gpuDial(kind, dial, px, tilt) {
+    if (!gpuReady(kind)) return null;
+    return root.TourbillonGL.render(kind, dial, px, { x: LX, y: LY, warmth: WARM, power: POWER }, tilt);
+  }
   function dialTexture(kind, dial, sizePx) {
     const px = Math.max(64, Math.min(2048, Math.round(sizePx)));
     const key = `${kind}|${dial.a}|${dial.b}|${px}|${KEY.toFixed(2)}|${WARM.toFixed(2)}|${POWER.toFixed(2)}`;
@@ -828,6 +838,13 @@
     const c = document.createElement('canvas');
     c.width = c.height = px;
     const g = c.getContext('2d');
+    const gpu = gpuDial(kind, dial, px, { x: 0, y: 0 });
+    if (gpu) {
+      g.drawImage(gpu, 0, 0);
+      if (textureCache.size > 40) textureCache.delete(textureCache.keys().next().value);
+      textureCache.set(key, c);
+      return c;
+    }
     const img = g.createImageData(px, px);
     const data = img.data;
     const A = hexToRgb(dial.a), B = hexToRgb(dial.b);
@@ -867,18 +884,22 @@
     circle(ctx, 0, 0, Rd);
     ctx.clip();
 
-    const base = ctx.createRadialGradient(-Rd * 0.25, -Rd * 0.35, Rd * 0.05, 0, 0, Rd * 1.05);
-    base.addColorStop(0, mix(dial.a, '#ffffff', 0.06));
-    base.addColorStop(0.6, dial.a);
-    base.addColorStop(1, dial.b);
-    ctx.fillStyle = base;
-    ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
+    if (!env.glDial) {
+      const base = ctx.createRadialGradient(-Rd * 0.25, -Rd * 0.35, Rd * 0.05, 0, 0, Rd * 1.05);
+      base.addColorStop(0, mix(dial.a, '#ffffff', 0.06));
+      base.addColorStop(0.6, dial.a);
+      base.addColorStop(1, dial.b);
+      ctx.fillStyle = base;
+      ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
+    }
 
     const pattern = model.texture;
-    if (TEXTURES[pattern]) {
-      const scale = ctx.getTransform().a || 1;
-      const tex = dialTexture(pattern, dial, Rd * 2 * scale);
-      ctx.drawImage(tex, -Rd, -Rd, Rd * 2, Rd * 2);
+    if (TEXTURES[pattern] || gpuReady(pattern)) {
+      if (!env.glDial) {
+        const scale = ctx.getTransform().a || 1;
+        const tex = dialTexture(pattern, dial, Rd * 2 * scale);
+        ctx.drawImage(tex, -Rd, -Rd, Rd * 2, Rd * 2);
+      }
       if (model.stepDial) {
         const rs = Rd * 0.875;
         ctx.lineWidth = Rd * 0.006;
@@ -2287,6 +2308,11 @@
   /* ------------------------------------------------------------ composition */
   function drawStatic(ctx, R, env, g) {
     drawDisc(ctx, R, env, g);
+    drawStaticPrint(ctx, R, env, g);
+  }
+
+  // Everything printed or applied on the dial, above its surface.
+  function drawStaticPrint(ctx, R, env, g) {
     drawDialBase(ctx, env, g);
     drawMinuteTrack(ctx, env, g);
     drawIndices(ctx, env, g);
@@ -2388,6 +2414,8 @@
       this.dpr = Math.min(root.devicePixelRatio || 1, 3);
       host.classList.add('tb-scene');
       this.bg = this._canvas('tb-bg');
+      this.dial = this._canvas('tb-dial');     // GPU-lit dial surface, redrawn as the view tilts
+      this.print = this._canvas('tb-print');   // printing, indices and complications
       this.live = this._canvas('tb-live');
       this.glass = this._canvas('tb-glass');
       this.media = root.matchMedia ? root.matchMedia('(prefers-color-scheme: dark)') : null;
@@ -2451,20 +2479,27 @@
       const b = bg.getContext('2d');
       b.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       drawBackground(b, w, h, this.cfg, dark, cx, cy, R);
+      this.glKind = gpuReady(this.env.model.texture) ? this.env.model.texture : null;
+      this.env.glDial = !!this.glKind;
       b.save();
       b.translate(cx, cy);
-      drawStatic(b, R, this.env, this.geo);
+      drawDisc(b, R, this.env, this.geo);
       b.restore();
 
-      // live + glass layers only cover the dial
+      // dial, print, live and glass layers only cover the dial
       const box = this.geo.Rd * 1.05;
-      for (const c of [this.live, this.glass]) {
+      for (const c of [this.dial, this.print, this.live, this.glass]) {
         c.style.left = cx - box + 'px';
         c.style.top = cy - box + 'px';
         c.style.width = c.style.height = box * 2 + 'px';
         c.width = c.height = Math.round(box * 2 * this.dpr);
       }
       this.box = box;
+      this._renderDial();
+      const pr = this.print.getContext('2d');
+      pr.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      pr.translate(box, box);
+      drawStaticPrint(pr, R, this.env, this.geo);
       const gl = this.glass.getContext('2d');
       gl.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       gl.translate(box, box);
@@ -2506,6 +2541,22 @@
       if (this.opts.fixedTime) { this.running = false; return; }
       requestAnimationFrame(this._tick);
     }
+    // The dial surface comes from the GPU: relief, brushed metal and lacquer lit live,
+    // with the view tilted by the cursor so highlights glide across it.
+    _renderDial() {
+      const ctx = this.dial.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, this.dial.width, this.dial.height);
+      if (!this.glKind) return;
+      applyLight(this.light);
+      const Rd = this.geo.Rd;
+      const px = Rd * 2 * this.dpr;
+      const tilt = this.cfg.parallax ? this.par : { x: 0, y: 0 };
+      const img = gpuDial(this.glKind, this.env.dial, px, tilt);
+      if (!img) return;
+      const off = (this.box - Rd) * this.dpr;
+      ctx.drawImage(img, off, off, px, px);
+    }
     /** Cursor position relative to the watch, -1…1 on each axis. */
     setPointer(x, y) {
       this.pointer.x = Math.max(-1, Math.min(1, x));
@@ -2523,6 +2574,7 @@
       const R = this.center.R;
       this.live.style.transform = `translate(${(-this.par.x * R * 0.01).toFixed(2)}px, ${(-this.par.y * R * 0.01).toFixed(2)}px)`;
       this.glass.style.transform = `translate(${(-this.par.x * R * 0.028).toFixed(2)}px, ${(-this.par.y * R * 0.028).toFixed(2)}px)`;
+      if (this.glKind) this._renderDial();
     }
     start() {
       if (this.running) return;
