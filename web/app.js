@@ -276,7 +276,7 @@
       section('Dial', dialSw, h('div', { class: 'sub-label' }, 'Dial at night (dark mode)'), nightSw),
       section('Hands & indices', matSw, bezelBlock),
       section('Complications', ...toggles),
-      section('Signature', row('Channel emblem', emblemSeg), row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
+      section('Signature', row('AET', emblemSeg), row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
       section('Scene',
         row('Appearance', appearanceSeg),
         row('Background', bgSeg),
