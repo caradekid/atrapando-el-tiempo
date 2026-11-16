@@ -11,6 +11,8 @@ A gift from **Caradekid** to the **Atrapando el tiempo** channel and its communi
   <img src="docs/moonchrono-dark.png" width="49%" alt="Moon Chrono dial, dark mode">
   <img src="docs/cocktail-light.png" width="49%" alt="Cocktail dial, light mode">
   <img src="docs/mediterraneo-dark.png" width="49%" alt="Mediterráneo dial, dark mode">
+  <img src="docs/seventies-light.png" width="49%" alt="Seventies dial, light mode">
+  <img src="docs/giltdiver-dark.png" width="49%" alt="Gilt Diver dial, dark mode">
 </p>
 
 ## What it does
@@ -35,15 +37,22 @@ All dials are procedural (no image files): textures computed pixel by pixel with
 | 🇯🇵 Japan | **Birch** | Vertical bark relief, *razor* faceted hands, 8 beats/s |
 | 🇯🇵 Japan | **Cocktail** | Radial grooves with a sunray flare, dauphine hands |
 | 🇯🇵 Japan | **Shell Diver** | Large lume plots, day-date, dive scale |
+| 🇯🇵 Japan | **Seventies** | Two-zone silver sunray, radial minute lines, day-date with a blue Saturday |
 | 🇨🇭 Switzerland | **Submersible** | Gloss dial, round plots, date magnifier (cyclops) |
 | 🇨🇭 Switzerland | **GMT** | Two-tone 24 h scale and second time-zone hand |
 | 🇨🇭 Switzerland | **Moon Chrono** | Matte black, three registers, tachymeter |
 | 🇨🇭 Switzerland | **Datum** | Sunburst, date with magnifier |
 | 🇨🇭 Switzerland | **Calatrava** | Dress dial, opaline, small seconds |
-| 🇨🇭 Switzerland | **Octagon** | Tapisserie grid |
+| 🇨🇭 Switzerland | **Octagon** | Black tapisserie grid, small seconds, inner flange |
 | 🇨🇭 Switzerland | **Guilloché** | Engine-turned guilloché, Roman numerals, pomme hands, **tourbillon** |
 | 🇨🇭 Switzerland | **Pilot** | Large aviation numerals, triangle at 12 |
 | 🇨🇭 Switzerland | **Skeleton** | Open-worked movement and **tourbillon** |
+| 🇨🇭 Switzerland | **Wave Diver** | Engraved wave dial, skeleton hands, double bar at 12, date at 6 |
+| 🇨🇭 Switzerland | **Gilt Diver** | Gilt printing, snowflake hands, aged lume, red triangle on the bezel |
+| 🇨🇭 Switzerland | **Slide Rule** | Aviation slide-rule scales around a grey sunray dial |
+| 🇨🇭 Switzerland | **Crosshair** | Black sunray, printed crosshair, rose-gold indices |
+| 🇨🇭 Switzerland | **Field** | Bold 1–12 with an inner 13–24 ring, date at 6, quartz tick |
+| 🇨🇭 Switzerland | **Expedition** | Applied 3-6-9 numerals in metal and lume, gloss black |
 | 🇪🇸 Spain | **Racing Chrono** | Racing chronograph, colour registers, quartz tick |
 | 🇪🇸 Spain | **Mediterráneo** | Vintage *compressor* diver with an inner scale and orange accents |
 

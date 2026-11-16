@@ -118,6 +118,12 @@
       motion: 'beat6', dateAt: 3, dayDate: true, sport: true,
       defaults: { dial: 'black', material: 'steel', bezel: 'black', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
     },
+    seventies: {
+      name: 'Seventies', origin: 'Japan', note: 'Two-zone silver, radial minute lines, day-date',
+      bezel: 'none', texture: 'sunray', indices: 'baton', hands: 'faceted', secondsHand: 'polishedNeedle',
+      track: 'radial', indexR: [0.63, 0.86], motion: 'beat6', dateAt: 3, dayDate: true,
+      defaults: { dial: 'silver', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'slate' },
+    },
     submersible: {
       name: 'Submersible', origin: 'Switzerland', note: 'Gloss dial, round plots, 60-minute scale',
       bezel: 'diver', texture: 'gloss', indices: 'dots', hands: 'sword', secondsHand: 'lollipop', whiteSeconds: true,
@@ -152,7 +158,7 @@
       name: 'Octagon', origin: 'Switzerland', note: 'Tapisserie grid, integrated-sport spirit',
       bezel: 'none', texture: 'tapisserie', indices: 'baton', hands: 'baton', secondsHand: 'polishedNeedle', rehaut: true,
       motion: 'beat8', dateAt: 3, sport: true,
-      defaults: { dial: 'blue', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
+      defaults: { dial: 'black', material: 'steel', tourbillon: false, centralSeconds: false, date: false, nightDial: 'same' },
     },
     guilloche: {
       name: 'Guilloché', origin: 'Switzerland', note: 'Engine-turned silver, pomme hands, tourbillon',
@@ -171,6 +177,42 @@
       bezel: 'none', texture: 'skeleton', indices: 'chapter', hands: 'feuille', secondsHand: 'needle',
       motion: 'beat6',
       defaults: { dial: 'slate', material: 'platinum', tourbillon: true, centralSeconds: false, nightDial: 'same' },
+    },
+    waveDiver: {
+      name: 'Wave Diver', origin: 'Switzerland', note: 'Engraved waves, skeleton hands, date at 6',
+      bezel: 'diver', texture: 'waves', indices: 'dots', twelve: 'double', hands: 'skeletonSword', secondsHand: 'lollipop',
+      motion: 'beat8', dateAt: 6, dateY: 0.7, sport: true,
+      defaults: { dial: 'black', material: 'steel', bezel: 'black', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
+    },
+    giltDiver: {
+      name: 'Gilt Diver', origin: 'Switzerland', note: 'Gilt print, snowflake hands, red triangle',
+      bezel: 'diver', texture: 'matte', indices: 'dots', hands: 'snowflake', secondsHand: 'lollipop', gilt: true, redPip: true,
+      motion: 'beat8', sport: true,
+      defaults: { dial: 'black', material: 'yellowgold', bezel: 'black', tourbillon: false, centralSeconds: true, date: false, nightDial: 'same' },
+    },
+    slideRule: {
+      name: 'Slide Rule', origin: 'Switzerland', note: 'Aviation slide-rule scale, grey sunray',
+      bezel: 'slide', texture: 'sunray', indices: 'baton', hands: 'baton', secondsHand: 'needle',
+      motion: 'beat8', sport: true,
+      defaults: { dial: 'slate', material: 'steel', tourbillon: false, centralSeconds: true, date: false, nightDial: 'same' },
+    },
+    crosshair: {
+      name: 'Crosshair', origin: 'Switzerland', note: 'Black sunray, printed crosshair, rose-gold indices',
+      bezel: 'none', texture: 'sunray', indices: 'faceted', hands: 'baton', secondsHand: 'polishedNeedle', crosshair: true,
+      motion: 'beat6',
+      defaults: { dial: 'black', material: 'rosegold', tourbillon: false, centralSeconds: true, date: false, nightDial: 'same' },
+    },
+    field: {
+      name: 'Field', origin: 'Switzerland', note: 'Bold 1–12, inner 13–24, date at 6',
+      bezel: 'none', texture: 'matte', indices: 'field', hands: 'sword', secondsHand: 'needle',
+      motion: 'tick', dateAt: 6, dateY: 0.56, dateHidesIndex: false, sport: true, wordmarkW: 0.52,
+      defaults: { dial: 'black', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'same' },
+    },
+    expedition: {
+      name: 'Expedition', origin: 'Switzerland', note: 'Applied 3-6-9, gloss black, lume',
+      bezel: 'none', texture: 'gloss', indices: 'explorer', hands: 'sword', secondsHand: 'lollipop', whiteSeconds: true,
+      motion: 'beat8', sport: true,
+      defaults: { dial: 'black', material: 'steel', tourbillon: false, centralSeconds: true, date: false, nightDial: 'same' },
     },
     racing: {
       name: 'Racing Chrono', origin: 'Spain', note: 'Bold sports chronograph, red accents, quartz tick',
@@ -251,12 +293,13 @@
     const mat = envMaterial(MATERIALS[cfg.material], dark);
     const lightDial = luminance(dial.a) > 0.5;
     const lumeGlow = dark && cfg.lume;
+    if (model.gilt) dial.ink = '#d8b866';
     return {
       cfg, model, dial, mat, dark, date: date || new Date(),
       lightDial,
-      lume: lumeGlow ? '#c9f7b5' : '#f1ecdc',
+      lume: model.gilt ? (lumeGlow ? '#e2f2b4' : '#ecdcb2') : lumeGlow ? '#c9f7b5' : '#f1ecdc',
       lumeGlow,
-      accent: model.orange ? '#ff7a1c' : model.blueSeconds ? '#2a52c9' : model.whiteSeconds ? '#f2f0ea'
+      accent: model.gilt ? '#d8b866' : model.orange ? '#ff7a1c' : model.blueSeconds ? '#2a52c9' : model.whiteSeconds ? '#f2f0ea'
         : model.racing ? '#e0262b' : model.sport ? '#d23a2c' : lightDial ? mat.lo : mat.hi,
       blued: '#22408f',
       shadow: dark ? 'rgba(0,0,0,0.62)' : 'rgba(45,32,20,0.30)',
@@ -487,7 +530,7 @@
 
   /* -------------------------------------------------------------- dial disc */
   // Dial only: a floating disc with a soft shadow. Sports models keep their scale as a flat outer ring.
-  const RING_MODELS = { diver: 1, gmt: 1, tachy: 1, compressor: 1 };
+  const RING_MODELS = { diver: 1, gmt: 1, tachy: 1, compressor: 1, slide: 1 };
 
   function drawDisc(ctx, R, env, g) {
     ctx.save();
@@ -511,8 +554,8 @@
   function drawBezelInsert(ctx, R, env, g) {
     const { model } = env;
     const r1 = g.Rd, r2 = R;
-    const flat = mix(env.dial.b, '#000000', model.bezel === 'compressor' ? 0.25 : 0.4);
-    const bz = model.bezel === 'tachy' || model.bezel === 'compressor' ? { top: flat, bottom: flat } : env.bezel;
+    const flat = mix(env.dial.b, '#000000', model.bezel === 'compressor' ? 0.25 : model.bezel === 'slide' ? 0.12 : 0.4);
+    const bz = model.bezel === 'tachy' || model.bezel === 'compressor' || model.bezel === 'slide' ? { top: flat, bottom: flat } : env.bezel;
     // two halves
     for (const [color, a0, a1] of [[bz.top, -Math.PI, 0], [bz.bottom, 0, Math.PI]]) {
       ctx.beginPath();
@@ -537,7 +580,7 @@
       ctx.stroke();
     }
     ctx.restore();
-    const ink = luminance(bz.top) > 0.6 ? '#1a1a1c' : '#efece3';
+    const ink = model.gilt ? '#d8b866' : luminance(bz.top) > 0.6 ? '#1a1a1c' : '#efece3';
     const mid = (r1 + r2) / 2;
     const fs = (r2 - r1) * 0.5;
     ctx.fillStyle = ink;
@@ -558,9 +601,10 @@
           ctx.lineTo(-fs * 0.6, -mid - fs * 0.5);
           ctx.lineTo(fs * 0.6, -mid - fs * 0.5);
           ctx.closePath();
-          ctx.fillStyle = env.lume;
-          if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = R * 0.03; }
+          ctx.fillStyle = model.redPip ? '#c41e2a' : env.lume;
+          if (env.lumeGlow && !model.redPip) { ctx.shadowColor = env.lume; ctx.shadowBlur = R * 0.03; }
           ctx.fill();
+          if (model.redPip) { circle(ctx, 0, -mid - fs * 0.12, fs * 0.16); ctx.fillStyle = env.lume; ctx.fill(); }
         } else if (m % 10 === 0) {
           ctx.fillText(String(m), 0, -mid);
         } else if (m % 5 === 0) {
@@ -590,6 +634,34 @@
         }
         ctx.restore();
       }
+    } else if (model.bezel === 'slide') {
+      // aviation slide rule: two logarithmic scales, the outer one on the rotating bezel
+      const pos = (v) => Math.log10(v / 10) * TAU;
+      const labels = [10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90];
+      for (const [row, rr, size] of [[0, mid + fs * 0.42, 0.42], [1, mid - fs * 0.5, 0.36]]) {
+        ctx.font = `500 ${fs * size}px "Avenir Next Condensed","Avenir Next",sans-serif`;
+        labels.forEach((v) => {
+          ctx.save();
+          ctx.rotate(pos(v));
+          ctx.fillStyle = v === 10 ? '#d23a2c' : ink;
+          ctx.fillText(String(v), 0, -rr);
+          ctx.restore();
+        });
+        ctx.lineWidth = R * 0.002;
+        for (let v = 10; v < 100; v += v < 20 ? 0.5 : v < 50 ? 1 : 2) {
+          ctx.save();
+          ctx.rotate(pos(v));
+          ctx.fillStyle = ink;
+          const major = labels.includes(v);
+          const len = fs * (major ? 0.22 : 0.13);
+          ctx.fillRect(-R * 0.0016, row ? -mid - fs * 0.1 : -mid + fs * 0.1 - len, R * 0.0032, len);
+          ctx.restore();
+        }
+      }
+      circle(ctx, 0, 0, mid);
+      ctx.strokeStyle = rgba(ink, 0.5);
+      ctx.lineWidth = R * 0.002;
+      ctx.stroke();
     } else if (model.bezel === 'compressor') {
       // inner rotating scale of a vintage super-compressor diver
       ctx.font = `600 ${fs * 0.75}px Futura,"Avenir Next",sans-serif`;
@@ -713,6 +785,15 @@
       const aniso = Math.pow(Math.abs(Math.cos(th - LIGHT_THETA)), 4);
       const side = slope * Math.sin(th - LIGHT_THETA);
       return [0.86 + groove * 0.1 + aniso * 0.45 + side * 0.12, aniso * 0.18 + Math.max(0, side) * 0.08];
+    },
+    waves(u, v, r, th, ctx) {
+      // laser-engraved waves running across the dial, each crest catching the light
+      const ph = (x, y) => (y * 13 + 0.85 * Math.sin(x * 3.1 + y * 1.4)) * Math.PI;
+      const e = 0.002;
+      const h0 = Math.sin(ph(u, v));
+      const dx = (Math.sin(ph(u + e, v)) - h0) / e, dy = (Math.sin(ph(u, v + e)) - h0) / e;
+      const lit = (dx * -LX + dy * -LY) * -0.0032;
+      return [0.97 + lit + h0 * 0.03, Math.max(0, lit) * 0.6];
     },
     gloss(u, v, r, th, ctx) {
       const rot = KEY - KEY0;
@@ -1016,6 +1097,34 @@
     const { dial, model } = env;
     const Rd = g.Rd;
     if (model.rehaut) { drawRehaut(ctx, env, g); return; }
+    if (model.crosshair) {
+      ctx.save();
+      ctx.strokeStyle = rgba(dial.ink, 0.45);
+      ctx.lineWidth = Rd * 0.0035;
+      ctx.beginPath();
+      ctx.moveTo(-Rd * 0.94, 0); ctx.lineTo(Rd * 0.94, 0);
+      ctx.moveTo(0, -Rd * 0.94); ctx.lineTo(0, Rd * 0.94);
+      ctx.stroke();
+      ctx.restore();
+    }
+    if (model.track === 'radial') {
+      // the outer zone: a slightly different finish crossed by a long line for every minute
+      ctx.save();
+      ring(ctx, 0, 0, Rd * 0.8, Rd);
+      ctx.fillStyle = env.lightDial ? 'rgba(0,0,0,0.035)' : 'rgba(255,255,255,0.03)';
+      ctx.fill('evenodd');
+      ctx.strokeStyle = rgba(dial.ink, 0.55);
+      for (let i = 0; i < 60; i++) {
+        const a = (i / 60) * TAU;
+        ctx.lineWidth = Rd * (i % 5 === 0 ? 0.006 : 0.0032);
+        const p0 = polar(Rd * 0.8, a), p1 = polar(Rd * 0.975, a);
+        ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+      }
+      ctx.lineWidth = Rd * 0.003;
+      circle(ctx, 0, 0, Rd * 0.8); ctx.stroke();
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.strokeStyle = rgba(dial.ink, 0.75);
     ctx.fillStyle = rgba(dial.ink, 0.85);
@@ -1104,10 +1213,11 @@
       const style = model.indices;
       if (style === 'baton' || style === 'faceted' || style === 'sport') {
         const faceted = style === 'faceted';
-        const r1 = Rd * (model.rehaut ? 0.69 : model.longIndices ? 0.7 : model.subdials ? 0.83 : faceted ? 0.74 : 0.78), r2 = Rd * (model.rehaut ? 0.875 : 0.91);
+        const r1 = Rd * (model.indexR ? model.indexR[0] : model.rehaut ? 0.69 : model.longIndices ? 0.7 : model.subdials ? 0.83 : faceted ? 0.74 : 0.78),
+          r2 = Rd * (model.indexR ? model.indexR[1] : model.rehaut ? 0.875 : 0.91);
         const mid = polar((r1 + r2) / 2, a);
         if (blocked(g, mid, margin)) continue;
-        if (model.dateAt === 3 && env.cfg.date && h === 3) continue;
+        if (dateHides(env, h)) continue;
         if (style === 'sport' && h % 3 === 0) {
           const p = polar(Rd * 0.8, a);
           ctx.save();
@@ -1132,7 +1242,7 @@
         const r = Rd * (big > 1 ? 0.8 : 0.83);
         const p = polar(r, a);
         if (blocked(g, p, margin)) continue;
-        if (env.cfg.date && h === 3) continue;
+        if (dateHides(env, h)) continue;
         ctx.save();
         ctx.rotate(a);
         castShadow(ctx, env.dark ? 'rgba(0,0,0,0.65)' : 'rgba(30,20,10,0.32)', Rd * 0.018, Rd * 0.012);
@@ -1141,7 +1251,14 @@
           noShadow(ctx);
           lumePaint(ctx, env, -Rd * 0.05, -r - Rd * 0.05, Rd * 0.05, -r + Rd * 0.05, Rd * 0.06);
         };
-        if (h === 0) {
+        if (h === 0 && model.twelve === 'double') {
+          for (const sx of [-1, 1]) {
+            ctx.beginPath(); ctx.roundRect(sx * Rd * 0.045 - Rd * 0.026, -r - Rd * 0.08, Rd * 0.052, Rd * 0.16, Rd * 0.008); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(sx * Rd * 0.045 - Rd * 0.016, -r - Rd * 0.068, Rd * 0.032, Rd * 0.136, Rd * 0.005); lume();
+            castShadow(ctx, env.dark ? 'rgba(0,0,0,0.65)' : 'rgba(30,20,10,0.32)', Rd * 0.018, Rd * 0.012);
+            ctx.fillStyle = metalConic(ctx, 0, -r, mat, -a);
+          }
+        } else if (h === 0) {
           const s = Rd * 0.085;
           ctx.beginPath();
           ctx.moveTo(0, -r + s * 0.75); ctx.lineTo(-s * 0.7, -r - s * 0.6); ctx.lineTo(s * 0.7, -r - s * 0.6); ctx.closePath();
@@ -1169,6 +1286,64 @@
         ctx.font = `400 ${Rd * (style === 'roman' ? 0.1 : 0.085)}px ${FONTS.didot.css}`;
         ctx.fillText(numerals[h], 0, -r);
         ctx.restore();
+      } else if (style === 'field') {
+        // military field dial: bold 1–12 and a small inner 13–24 ring
+        const p = polar(Rd * 0.79, a);
+        ctx.save();
+        ctx.fillStyle = env.lumeGlow ? env.lume : dial.ink;
+        if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = Rd * 0.04 * ctxScale(ctx); }
+        ctx.font = `700 ${Rd * 0.15}px "DIN Alternate","Avenir Next",sans-serif`;
+        ctx.fillText(String(h === 0 ? 12 : h), p.x, p.y + Rd * 0.008);
+        noShadow(ctx);
+        const q = polar(Rd * 0.6, a);
+        const dg = dateGeometry(env, g);
+        const nearDate = dg && Math.hypot(q.x - dg.x, q.y - dg.y) < Rd * 0.15;
+        const nearEmblem = h === 0 && env.cfg.emblem !== 'none';
+        if (!nearDate && !nearEmblem && !blocked(g, q, Rd * 0.03)) {
+          ctx.fillStyle = rgba(dial.ink, 0.85);
+          ctx.font = `600 ${Rd * 0.058}px "DIN Alternate","Avenir Next",sans-serif`;
+          ctx.fillText(String(h === 0 ? 24 : h + 12), q.x, q.y);
+        }
+        ctx.restore();
+      } else if (style === 'explorer') {
+        // applied 3-6-9 numerals outlined in metal and filled with lume, a triangle at 12
+        const r1 = Rd * 0.78, r2 = Rd * 0.91;
+        if (h === 0) {
+          const r = Rd * 0.83, s2 = Rd * 0.09;
+          ctx.save();
+          castShadow(ctx, env.dark ? 'rgba(0,0,0,0.65)' : 'rgba(30,20,10,0.32)', Rd * 0.018, Rd * 0.012);
+          ctx.fillStyle = metalConic(ctx, 0, -r, mat, 0);
+          ctx.beginPath(); ctx.moveTo(0, -r + s2 * 0.75); ctx.lineTo(-s2 * 0.7, -r - s2 * 0.6); ctx.lineTo(s2 * 0.7, -r - s2 * 0.6); ctx.closePath(); ctx.fill();
+          noShadow(ctx);
+          ctx.beginPath(); ctx.moveTo(0, -r + s2 * 0.5); ctx.lineTo(-s2 * 0.5, -r - s2 * 0.45); ctx.lineTo(s2 * 0.5, -r - s2 * 0.45); ctx.closePath();
+          lumePaint(ctx, env, -s2, -r - s2, s2, -r + s2, Rd * 0.06);
+          ctx.restore();
+        } else if (h % 3 === 0) {
+          const p = polar(Rd * 0.8, a);
+          if (dateHides(env, h)) continue;
+          ctx.save();
+          ctx.font = `700 ${Rd * 0.17}px "DIN Alternate","Avenir Next",sans-serif`;
+          castShadow(ctx, env.dark ? 'rgba(0,0,0,0.65)' : 'rgba(30,20,10,0.32)', Rd * 0.02, Rd * 0.012);
+          ctx.lineJoin = 'round';
+          ctx.lineWidth = Rd * 0.016;
+          ctx.strokeStyle = facetColor(mat, a + Math.PI);
+          ctx.strokeText(String(h), p.x, p.y + Rd * 0.01);
+          noShadow(ctx);
+          if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = Rd * 0.05 * ctxScale(ctx); }
+          ctx.fillStyle = env.lume;
+          ctx.fillText(String(h), p.x, p.y + Rd * 0.01);
+          noShadow(ctx);
+          ctx.lineWidth = Rd * 0.004;
+          ctx.strokeStyle = rgba('#ffffff', 0.35);
+          ctx.strokeText(String(h), p.x - Rd * 0.002, p.y + Rd * 0.008);
+          ctx.restore();
+        } else {
+          const w = Rd * 0.034;
+          ctx.save();
+          ctx.rotate(a);
+          appliedBar(ctx, env, -w / 2, -r2, w, r2 - r1, true, a);
+          ctx.restore();
+        }
       } else if (style === 'arabic') {
         const r = Rd * 0.78;
         const p = polar(r, a);
@@ -1333,7 +1508,7 @@
     let size = Rd * (withEmblem ? 0.062 : 0.085);
     if (cfg.wordmark) {
       const sp = size * 0.22;
-      size = fitFont(ctx, cfg.wordmark, 400, size, env.font, sp, Rd * 0.7);
+      size = fitFont(ctx, cfg.wordmark, 400, size, env.font, sp, Rd * (env.model.wordmarkW || 0.7));
       spacedText(ctx, cfg.wordmark, 0, y, size * 0.22);
     }
     if (cfg.subline) {
@@ -1352,8 +1527,15 @@
     const Rd = g.Rd;
     const day = !!model.dayDate;
     const w = Rd * (day ? 0.3 : 0.15), h = Rd * 0.11;
+    if (model.dateAt === 6) return { x: 0, y: Rd * (model.dateY || 0.66), w, h, day };
     const x = Rd * (model.indices === 'dots' || model.indices === 'bigdots' ? 0.66 : 0.64) - (day ? Rd * 0.07 : 0);
-    return { x, w, h, day };
+    return { x, y: 0, w, h, day };
+  }
+
+  // Does the date window replace the hour marker at this position?
+  function dateHides(env, h) {
+    const m = env.model;
+    return !!(env.cfg.date && m.dateAt && !m.subdials && m.dateHidesIndex !== false && h % 12 === m.dateAt % 12);
   }
 
   function drawDate(ctx, env, g) {
@@ -1363,6 +1545,7 @@
     const Rd = g.Rd;
     const { x, w, h } = d;
     ctx.save();
+    ctx.translate(0, d.y);
     ctx.beginPath();
     ctx.roundRect(x - w / 2 - Rd * 0.012, -h / 2 - Rd * 0.012, w + Rd * 0.024, h + Rd * 0.024, Rd * 0.01);
     ctx.fillStyle = metalLinear(ctx, x - w, -h, x + w, h, mat);
@@ -1383,7 +1566,7 @@
     ctx.font = `600 ${h * 0.72}px "Helvetica Neue","Avenir Next",sans-serif`;
     if (d.day) {
       const dow = env.date.getDay();
-      ctx.fillStyle = dow === 0 ? '#c8202c' : ink;
+      ctx.fillStyle = dow === 0 ? '#c8202c' : dow === 6 ? '#1f63c4' : ink;
       ctx.fillText(DAYS[dow], x - w * 0.18, h * 0.04);
       ctx.fillStyle = ink;
       ctx.fillRect(x + w * 0.12, -h * 0.5, Rd * 0.004, h);
@@ -1402,6 +1585,7 @@
     const lw = Rd * 0.2, lh = Rd * 0.16;
     const x = d.x;
     ctx.save();
+    ctx.translate(0, d.y);
     ctx.beginPath();
     ctx.roundRect(x - lw / 2, -lh / 2, lw, lh, Rd * 0.035);
     ctx.save();
@@ -1796,6 +1980,29 @@
       },
     }),
     pilot: (L, W) => Object.assign(HANDS.sword(L, W), { finish: 'pilot' }),
+    // a slim stem carrying a square lume plot with a pointed tip
+    snowflake: (L, W) => ({
+      path(c) {
+        const s = W * 0.62;
+        c.moveTo(-W * 0.16, L * 0.15); c.lineTo(-W * 0.16, -L * 0.56);
+        c.lineTo(-s, -L * 0.56); c.lineTo(-s, -L * 0.8); c.lineTo(-W * 0.16, -L * 0.8);
+        c.lineTo(0, -L); c.lineTo(W * 0.16, -L * 0.8); c.lineTo(s, -L * 0.8); c.lineTo(s, -L * 0.56);
+        c.lineTo(W * 0.16, -L * 0.56); c.lineTo(W * 0.16, L * 0.15); c.closePath();
+      },
+      finish: 'facets',
+      lume(c) { c.roundRect(-W * 0.48, -L * 0.785, W * 0.96, L * 0.21, W * 0.08); },
+    }),
+    // open-worked sword: only the tip carries lume
+    skeletonSword: (L, W) => ({
+      path(c) {
+        c.moveTo(-W * 0.22, L * 0.12); c.lineTo(-W * 0.5, -L * 0.72); c.lineTo(0, -L);
+        c.lineTo(W * 0.5, -L * 0.72); c.lineTo(W * 0.22, L * 0.12); c.closePath();
+        c.moveTo(-W * 0.1, -L * 0.12); c.lineTo(W * 0.1, -L * 0.12); c.lineTo(W * 0.3, -L * 0.66);
+        c.lineTo(-W * 0.3, -L * 0.66); c.closePath();
+      },
+      finish: 'facets',
+      lume(c) { c.moveTo(-W * 0.28, -L * 0.72); c.lineTo(0, -L * 0.93); c.lineTo(W * 0.28, -L * 0.72); c.closePath(); },
+    }),
     arrow: (L, W) => ({
       path(c) {
         c.moveTo(-W * 0.2, L * 0.15); c.lineTo(-W * 0.2, -L * 0.55); c.lineTo(-W * 0.62, -L * 0.6); c.lineTo(0, -L);
@@ -1861,7 +2068,7 @@
     let finish = shape.finish;
     if (finish === 'pilot') finish = env.lightDial ? 'blued' : 'facets';
     if (finish === 'breguet') finish = env.lightDial ? 'blued' : 'facets';
-    const rule = kind === 'breguet' ? 'evenodd' : 'nonzero';
+    const rule = kind === 'breguet' || kind === 'skeletonSword' ? 'evenodd' : 'nonzero';
     const outline = () => { ctx.beginPath(); shape.path(ctx); };
 
     ctx.save();
@@ -1976,13 +2183,13 @@
       ctx.restore();
     }
     const kind = model.hands;
-    const widths = { dauphine: [0.085, 0.07], baton: [0.06, 0.045], sword: [0.085, 0.065], pilot: [0.1, 0.075], breguet: [0.055, 0.045], feuille: [0.085, 0.065], faceted: [0.09, 0.062], arrow: [0.11, 0.07] }[kind];
+    const widths = { dauphine: [0.085, 0.07], baton: [0.06, 0.045], sword: [0.085, 0.065], pilot: [0.1, 0.075], breguet: [0.055, 0.045], feuille: [0.085, 0.065], faceted: [0.09, 0.062], arrow: [0.11, 0.07], snowflake: [0.11, 0.07], skeletonSword: [0.085, 0.065] }[kind];
     if (model.gmt) {
       const gA = ((t.h + t.m / 60) / 24) * TAU;
       drawHand(ctx, env, 'gmt', Rd * 0.9, Rd * 0.016, gA, 0.4);
     }
     drawHand(ctx, env, kind, Rd * 0.56, Rd * widths[0], hA, 0.5);
-    drawHand(ctx, env, kind === 'arrow' ? 'sword' : kind, Rd * (model.indices === 'dots' ? 0.86 : 0.84), Rd * widths[1], mA, 0.75);
+    drawHand(ctx, env, kind === 'arrow' || kind === 'snowflake' ? 'sword' : kind, Rd * (model.indices === 'dots' ? 0.86 : 0.84), Rd * widths[1], mA, 0.75);
     const showCentral = model.subdials || cfg.centralSeconds;
     if (showCentral) drawHand(ctx, env, model.secondsHand, Rd * 0.9, Rd * 0.011, sA, 1);
     // centre stack: a polished cap with a bevelled rim, then the seconds pinion
