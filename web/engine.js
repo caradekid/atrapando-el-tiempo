@@ -96,7 +96,7 @@
   const MODELS = {
     snowfield: {
       name: 'Snowfield', origin: 'Japan', note: 'Wind-swept snow texture, gliding seconds, power reserve',
-      bezel: 'none', texture: 'snow', indices: 'faceted', hands: 'faceted', secondsHand: 'needle', blueSeconds: true,
+      bezel: 'none', texture: 'snow', indices: 'faceted', hands: 'faceted', secondsHand: 'bluedNeedle', blueSeconds: true, rehaut: true,
       motion: 'glide', powerReserve: true, dateAt: 3,
       defaults: { dial: 'snow', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'slate' },
     },
@@ -616,18 +616,24 @@
   // Each texture returns [brightness multiplier, additive white sheen] for a point.
   const TEXTURES = {
     snow(u, v, r, th, ctx) {
-      // drifting, wind-blown snow: warped ridged noise, lit as a height field
+      // wind-swept snow: drifts stretched along the wind, lit as a height field, with fine sparkle
+      const ca = Math.cos(0.55), sa = Math.sin(0.55);
       const h = (x, y) => {
-        const w = fbm(x * 0.35, y * 0.35, 2) * 2.2;
-        const n = fbm(x + w, y * 1.25 + w, 4);
-        return 1 - Math.abs(n * 2 - 1);
+        const w = fbm(x * 0.3, y * 0.3, 2) * 2.4;
+        const n = fbm(x + w, y + w * 0.6, 5);
+        const ridge = 1 - Math.abs(n * 2 - 1);
+        return ridge * ridge;
       };
-      const X = u * 40, Y = v * 40, e = 0.05;
+      const U = u * ca - v * sa, V = u * sa + v * ca;
+      const X = U * 30, Y = V * 58, e = 0.045;
       const h0 = h(X, Y);
-      const dx = (h(X + e, Y) - h0) / e, dy = (h(X, Y + e) - h0) / e;
-      const lit = (dx * -LX + dy * -LY) * -0.03;
-      const spark = hash2(Math.floor(u * ctx.px), Math.floor(v * ctx.px)) > 0.9985 ? 0.25 : 0;
-      return [1 + lit + (h0 - 0.5) * 0.05, Math.max(0, lit) * 0.35 + spark];
+      const gx = (h(X + e, Y) - h0) / e, gy = (h(X, Y + e) - h0) / e;
+      // back to screen space before lighting
+      const dx = gx * ca * 30 / 40 + gy * sa * 58 / 40, dy = -gx * sa * 30 / 40 + gy * ca * 58 / 40;
+      const lit = (dx * -LX + dy * -LY) * -0.026;
+      const seed = hash2(Math.floor(u * ctx.px * 0.9), Math.floor(v * ctx.px * 0.9));
+      const spark = seed > 0.9975 ? 0.1 + (seed - 0.9975) * 120 : 0;
+      return [1.01 + lit + (h0 - 0.4) * 0.05, Math.max(0, lit) * 0.4 + spark];
     },
     birch(u, v, r, th, ctx) {
       // vertical bark: sharp ridged grooves that wander and break, lit from the side
@@ -910,9 +916,56 @@
     ctx.stroke();
   }
 
+  // Rehaut: the angled ring between dial and crystal, with the minute track printed on it.
+  // It faces the centre, so it is brightest on the side opposite the light.
+  function drawRehaut(ctx, env, g) {
+    const { dial } = env;
+    const Rd = g.Rd;
+    const r0 = Rd * 0.928;
+    const base = mix(dial.a, luminance(dial.a) > 0.5 ? '#c3c9d0' : '#000000', 0.1);
+    ring(ctx, 0, 0, r0, Rd);
+    ctx.fillStyle = base;
+    ctx.fill('evenodd');
+    const lit = ctx.createConicGradient(-Math.PI / 2, 0, 0);
+    for (let i = 0; i <= 36; i++) {
+      const a = (i / 36) * TAU;
+      const b = facetLight(a + Math.PI);
+      lit.addColorStop(i / 36, b > 0.5 ? `rgba(255,255,255,${(b - 0.5) * 0.6})` : `rgba(0,0,0,${(0.5 - b) * 0.16})`);
+    }
+    ring(ctx, 0, 0, r0, Rd);
+    ctx.fillStyle = lit;
+    ctx.fill('evenodd');
+    const slope = ctx.createRadialGradient(0, 0, r0, 0, 0, Rd);
+    slope.addColorStop(0, 'rgba(0,0,0,0.06)');
+    slope.addColorStop(0.5, 'rgba(0,0,0,0)');
+    slope.addColorStop(1, 'rgba(0,0,0,0.07)');
+    ring(ctx, 0, 0, r0, Rd);
+    ctx.fillStyle = slope;
+    ctx.fill('evenodd');
+    // printed minute track, foreshortened by the slope
+    ctx.strokeStyle = rgba(dial.ink, 0.82);
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * TAU;
+      const major = i % 5 === 0;
+      ctx.lineWidth = Rd * (major ? 0.0065 : 0.0035);
+      const p0 = polar(r0 + Rd * (major ? 0.012 : 0.03), a), p1 = polar(Rd * 0.985, a);
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+    }
+    // the step where the dial meets the flange
+    circle(ctx, 0, 0, r0);
+    ctx.strokeStyle = 'rgba(0,0,0,0.14)';
+    ctx.lineWidth = Rd * 0.004;
+    ctx.stroke();
+    circle(ctx, 0, 0, r0 + Rd * 0.003);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = Rd * 0.002;
+    ctx.stroke();
+  }
+
   function drawMinuteTrack(ctx, env, g) {
     const { dial, model } = env;
     const Rd = g.Rd;
+    if (model.rehaut) { drawRehaut(ctx, env, g); return; }
     ctx.save();
     ctx.strokeStyle = rgba(dial.ink, 0.75);
     ctx.fillStyle = rgba(dial.ink, 0.85);
@@ -1001,7 +1054,7 @@
       const style = model.indices;
       if (style === 'baton' || style === 'faceted' || style === 'sport') {
         const faceted = style === 'faceted';
-        const r1 = Rd * (model.subdials ? 0.83 : faceted ? 0.74 : 0.78), r2 = Rd * 0.91;
+        const r1 = Rd * (model.rehaut ? 0.69 : model.subdials ? 0.83 : faceted ? 0.74 : 0.78), r2 = Rd * (model.rehaut ? 0.875 : 0.91);
         const mid = polar((r1 + r2) / 2, a);
         if (blocked(g, mid, margin)) continue;
         if (model.dateAt === 3 && env.cfg.date && h === 3) continue;
@@ -1721,6 +1774,14 @@
         finish: 'breguet',
       };
     },
+    bluedNeedle: (L, W) => ({
+      path(c) {
+        c.moveTo(-W * 0.6, L * 0.08); c.lineTo(-W * 0.32, -L * 0.96); c.lineTo(0, -L);
+        c.lineTo(W * 0.32, -L * 0.96); c.lineTo(W * 0.6, L * 0.08); c.closePath();
+        c.roundRect(-W * 1.15, L * 0.06, W * 2.3, L * 0.24, W * 1.15);
+      },
+      finish: 'blued',
+    }),
     needle: (L, W) => ({
       path(c) { c.roundRect(-W * 0.5, -L, W, L * 1.25, W * 0.5); c.moveTo(W * 2, L * 0.2); c.arc(0, L * 0.2, W * 2, 0, TAU); },
       finish: 'accent',
@@ -1855,14 +1916,14 @@
       const a = -Math.PI * 0.32 + reserve * Math.PI * 0.64;
       ctx.save();
       ctx.translate(g.pr.x, g.pr.y);
-      drawHand(ctx, env, 'sub', g.pr.r * 0.82, g.pr.r * 0.05, a, 0.3);
+      drawHand(ctx, env, 'faceted', g.pr.r * 0.86, g.pr.r * 0.075, a, 0.3);
       circle(ctx, 0, 0, g.pr.r * 0.08);
       ctx.fillStyle = metalConic(ctx, 0, 0, env.mat);
       ctx.fill();
       ctx.restore();
     }
     const kind = model.hands;
-    const widths = { dauphine: [0.085, 0.07], baton: [0.06, 0.045], sword: [0.085, 0.065], pilot: [0.1, 0.075], breguet: [0.055, 0.045], feuille: [0.085, 0.065], faceted: [0.07, 0.055], arrow: [0.11, 0.07] }[kind];
+    const widths = { dauphine: [0.085, 0.07], baton: [0.06, 0.045], sword: [0.085, 0.065], pilot: [0.1, 0.075], breguet: [0.055, 0.045], feuille: [0.085, 0.065], faceted: [0.09, 0.062], arrow: [0.11, 0.07] }[kind];
     if (model.gmt) {
       const gA = ((t.h + t.m / 60) / 24) * TAU;
       drawHand(ctx, env, 'gmt', Rd * 0.9, Rd * 0.016, gA, 0.4);
