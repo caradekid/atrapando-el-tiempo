@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  A gift from <b>Caradekid</b> to the <a href="https://www.youtube.com/@AtrapandoelTiempo"><b>Atrapando el tiempo</b></a> channel and its community.<br>
+  A gift from <a href="https://www.instagram.com/caradekid.jpg/"><b>Caradekid</b></a> to the <a href="https://www.youtube.com/@AtrapandoelTiempo"><b>Atrapando el tiempo</b></a> channel and its community.<br>
   <sub><a href="README.md">Versión en español</a></sub>
 </p>
 
@@ -138,4 +138,4 @@ cd atrapando-el-tiempo && make install
 
 ## ✦ Credits
 
-Concept and design by **Caradekid** for **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. The channel emblem belongs to Atrapando el tiempo and is used here for this gift. The code is MIT-licensed; the emblem is not covered by that licence.
+Concept and design by **[Caradekid](https://www.instagram.com/caradekid.jpg/)** for **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. The channel emblem belongs to Atrapando el tiempo and is used here for this gift. The code is MIT-licensed; the emblem is not covered by that licence.

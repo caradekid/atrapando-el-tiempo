@@ -14,6 +14,7 @@
   const isNative = !!(boot.native && bridge);
   const STORE_KEY = 'atrapando-el-tiempo.config.v1';
   const CHANNEL = 'https://www.youtube.com/@AtrapandoelTiempo';
+  const CREATOR = 'https://www.instagram.com/caradekid.jpg/';
   // In the Mac app links open in the browser, not inside the settings window.
   function openExternal(e) {
     if (!isNative) return;
@@ -159,7 +160,7 @@
       h('div', { class: 'stage-bar' },
         h('div', { class: 'brand' },
           h('a', { href: CHANNEL, target: '_blank', rel: 'noopener', onclick: openExternal, title: 'Atrapando el tiempo on YouTube' }, 'Atrapando el tiempo'),
-          h('small', {}, '× Caradekid · live watch wallpaper · works offline')),
+          h('small', {}, '× ', h('a', { href: CREATOR, target: '_blank', rel: 'noopener', onclick: openExternal, title: 'Caradekid on Instagram' }, 'Caradekid'), ' · live watch wallpaper · works offline')),
         h('div', { class: 'row' }, h('span', { class: 'sub-label', style: 'margin:0' }, 'Preview'), previewSeg)),
       h('div', { class: 'preview-wrap' }, previewHost),
       h('div', { class: 'stage-foot' }, 'Light and dark follow macOS automatically when Appearance is set to Auto.'),

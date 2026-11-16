@@ -52,7 +52,7 @@ const info = {
   Title: 'Atrapando el tiempo × Caradekid',
   Thumbnail: 'thumbnail.jpg',
   Preview: 'thumbnail.jpg',
-  Desc: `Live, photorealistic watch-dial wallpaper with the real time: ${modelIds.length} dials inspired by Japanese, Swiss and Spanish classics, light that follows the time of day and the cursor, light and dark mode. Works offline. A gift from Caradekid to Atrapando el tiempo — https://www.youtube.com/@AtrapandoelTiempo · v${version}`,
+  Desc: `Live, photorealistic watch-dial wallpaper with the real time: ${modelIds.length} dials inspired by Japanese, Swiss and Spanish classics, light that follows the time of day and the cursor, light and dark mode. Works offline. A gift from Caradekid (https://www.instagram.com/caradekid.jpg/) to Atrapando el tiempo (https://www.youtube.com/@AtrapandoelTiempo) · v${version}`,
   Author: 'Caradekid',
   License: 'MIT (code). The channel emblem belongs to Atrapando el tiempo.',
   Contact: 'https://github.com/caradekid/atrapando-el-tiempo',

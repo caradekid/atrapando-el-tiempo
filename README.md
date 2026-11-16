@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  Un regalo de <b>Caradekid</b> para el canal <a href="https://www.youtube.com/@AtrapandoelTiempo"><b>Atrapando el tiempo</b></a> y su comunidad.<br>
+  Un regalo de <a href="https://www.instagram.com/caradekid.jpg/"><b>Caradekid</b></a> para el canal <a href="https://www.youtube.com/@AtrapandoelTiempo"><b>Atrapando el tiempo</b></a> y su comunidad.<br>
   <sub><a href="README.en.md">English version</a></sub>
 </p>
 
@@ -138,4 +138,4 @@ cd atrapando-el-tiempo && make install
 
 ## ✦ Créditos
 
-Idea y diseño de **Caradekid** para **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. El emblema del canal pertenece a Atrapando el tiempo y se usa con motivo de este regalo. El código tiene licencia MIT; el emblema no está incluido en esa licencia.
+Idea y diseño de **[Caradekid](https://www.instagram.com/caradekid.jpg/)** para **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. El emblema del canal pertenece a Atrapando el tiempo y se usa con motivo de este regalo. El código tiene licencia MIT; el emblema no está incluido en esa licencia.
