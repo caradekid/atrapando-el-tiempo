@@ -2635,7 +2635,7 @@
   }
 
   root.TourbillonEngine = {
-    MODELS, DIALS, MATERIALS, BEZELS, FONTS, drawLogo, EMBLEM, DEFAULTS,
+    MODELS, DIALS, MATERIALS, BEZELS, FONTS, drawLogo, EMBLEM, drawBackground, DEFAULTS,
     normalizeConfig, composeFrame, renderWatch, Scene, mix,
   };
 })(typeof window !== 'undefined' ? window : this);

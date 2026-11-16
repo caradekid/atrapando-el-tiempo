@@ -43,6 +43,10 @@ final class SettingsWindowController: NSWindowController, WKScriptMessageHandler
         switch type {
         case "config":
             if let cfg = body["config"], let json = Web.jsonString(cfg) { onConfig?(json) }
+        case "open":
+            if let link = body["url"] as? String, let url = URL(string: link), url.scheme == "https" {
+                NSWorkspace.shared.open(url)
+            }
         case "action":
             guard let name = body["name"] as? String else { return }
             if let cfg = body["config"], let json = Web.jsonString(cfg) { onConfig?(json) }

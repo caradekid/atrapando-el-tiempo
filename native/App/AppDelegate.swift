@@ -58,6 +58,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         login.state = SMAppService.mainApp.status == .enabled ? .on : .off
         menu.addItem(login)
         menu.addItem(.separator())
+        menu.addItem(item("Atrapando el tiempo on YouTube", #selector(openChannel)))
+        menu.addItem(.separator())
         menu.addItem(item("Quit Atrapando el Tiempo", #selector(quit), key: "q"))
     }
 
@@ -95,6 +97,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func quit() { NSApp.terminate(nil) }
+
+    @objc private func openChannel() {
+        if let url = URL(string: "https://www.youtube.com/@AtrapandoelTiempo") { NSWorkspace.shared.open(url) }
+    }
 
     // MARK: actions shared by the menu and the settings panel
 

@@ -2,6 +2,7 @@
 //
 //   swift scripts/render.swift <out.png> <width> <height> <light|dark> [model] [extra-json]
 //   swift scripts/render.swift --heic <out.heic> <width> <height> [model]
+//   swift scripts/render.swift --page <out.png> <page.html> <js expression returning base64 PNG>
 //
 // Used to produce README images and the screen saver thumbnail, and as a smoke test
 // for the snapshot and light/dark HEIC pipeline.
@@ -36,7 +37,36 @@ func writeAppearanceHEIC(light: CGImage, dark: CGImage, to url: URL) -> Bool {
 }
 
 @MainActor
+func renderPage(_ out: URL, page: String, expression: String) async -> Int32 {
+    let window = NSWindow(contentRect: NSRect(x: -10_000, y: -10_000, width: 320, height: 200),
+                          styleMask: .borderless, backing: .buffered, defer: false)
+    window.alphaValue = 0
+    let view = WKWebView(frame: NSRect(x: 0, y: 0, width: 320, height: 200))
+    window.contentView = view
+    window.orderBack(nil)
+    let loader = Loader()
+    view.navigationDelegate = loader
+    await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+        loader.done = { c.resume() }
+        view.loadFileURL(root.appendingPathComponent(page), allowingReadAccessTo: root)
+    }
+    do {
+        let any = try await view.callAsyncJavaScript("return await (\(expression))", arguments: [:], contentWorld: .page)
+        guard let b64 = any as? String, let data = Data(base64Encoded: b64) else { print("no image returned"); return 1 }
+        try data.write(to: out)
+        print("wrote \(out.path)")
+        return 0
+    } catch {
+        print("page error: \(error)")
+        return 1
+    }
+}
+
+@MainActor
 func run() async -> Int32 {
+    if args.count > 4 && args[1] == "--page" {
+        return await renderPage(URL(fileURLWithPath: args[2]), page: args[3], expression: args[4])
+    }
     let heic = args.count > 1 && args[1] == "--heic"
     let a = heic ? Array(args.dropFirst(1)) : args
     guard a.count >= 4 else {
