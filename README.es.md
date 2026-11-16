@@ -29,13 +29,13 @@ Un fondo de pantalla que es un reloj de verdad. Eliges una esfera inspirada en l
 
 Todo se dibuja en tiempo real, sin imágenes: texturas en relieve calculadas en la tarjeta gráfica, índices tallados como gemas, agujas pulidas que brillan al girar, lume que se ilumina por la noche y un cristal de zafiro con sus reflejos. Cada esfera lleva el medallón del canal.
 
-<p align="center"><img src="docs/macro.jpg" alt="Detalles en macro: tapisserie, textura de nieve y lume dorado"></p>
+<p align="center"><img src="docs/es/macro.jpg" alt="Detalles en macro: tapisserie, textura de nieve y lume dorado"></p>
 
 ## ✦ La colección
 
 22 esferas, de las de vestir a las de buceo, pasando por cronógrafos, pilotos y relojes de campo. Cada una con sus colores, su forma de aguja y su ritmo de segundero.
 
-<p align="center"><img src="docs/collection.jpg" alt="Las 22 esferas de la colección"></p>
+<p align="center"><img src="docs/es/collection.jpg" alt="Las 22 esferas de la colección"></p>
 
 | Origen | Esferas |
 | --- | --- |
@@ -49,13 +49,13 @@ Todo se dibuja en tiempo real, sin imágenes: texturas en relieve calculadas en 
 
 La luz sigue la hora del día: por la mañana entra por la izquierda, a mediodía desde arriba, al atardecer desde la derecha con un tono ámbar, y de noche es una lámpara cálida de escritorio. Al mover el ratón, la luz gira como si inclinaras el reloj bajo una lámpara, y los reflejos recorren la esfera, las agujas y el cristal.
 
-<p align="center"><img src="docs/hours.jpg" alt="La misma esfera por la mañana, a mediodía, al atardecer y de noche"></p>
+<p align="center"><img src="docs/es/hours.jpg" alt="La misma esfera por la mañana, a mediodía, al atardecer y de noche"></p>
 
 ## ✦ Claro y oscuro
 
 Sigue el modo claro u oscuro del sistema. Cada esfera puede tener su versión de noche, y el lume brilla en la oscuridad.
 
-<p align="center"><img src="docs/lightdark.jpg" alt="La misma esfera en modo claro y en modo oscuro"></p>
+<p align="center"><img src="docs/es/lightdark.jpg" alt="La misma esfera en modo claro y en modo oscuro"></p>
 
 ## ✦ Instalación
 
