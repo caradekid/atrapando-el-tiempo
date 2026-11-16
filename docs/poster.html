@@ -16,8 +16,10 @@
   (function () {
     'use strict';
     const E = TourbillonEngine;
-    const SERIF = '"Didot","Bodoni 72",serif';
-    const SANS = '"Avenir Next","Helvetica Neue",sans-serif';
+    // modern type for the page itself; the dials keep their own lettering
+    const DISPLAY = '600 system-ui,"SF Pro Display","Avenir Next",sans-serif';
+    const LIGHT = '300 system-ui,"SF Pro Display","Avenir Next",sans-serif';
+    const SANS = 'system-ui,"SF Pro Text","Avenir Next",sans-serif';
     const at = (h, m, s) => { const t = new Date(); t.setHours(h, m, s || 31, 0); return t; };
     const cfgOf = (model, extra) => Object.assign({}, E.DEFAULTS, E.MODELS[model].defaults, { model, light: 'fixed', emblem: 'printed' }, extra || {});
     const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
@@ -36,7 +38,10 @@
     }
     function label(ctx, text, x, y, size, color, font, spacing) {
       ctx.fillStyle = color;
-      ctx.font = `${size}px ${font || SANS}`;
+      // a family may carry its weight up front ("600 system-ui,…"); canvas wants "weight size family"
+      const f = font || SANS;
+      const m = /^(\d{3}|italic)\s+(.*)$/.exec(f);
+      ctx.font = m ? `${m[1]} ${size}px ${m[2]}` : `${size}px ${f}`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       if (spacing) spaced(ctx, text, x, y, spacing); else ctx.fillText(text, x, y);
@@ -47,8 +52,8 @@
       hero(w = 2400, h = 1260) {
         const c = canvas(w, h), ctx = c.getContext('2d');
         scene(ctx, w, h, true, 'spotlight', w / 2, h * 0.64, h * 0.42);
-        label(ctx, 'ATRAPANDO EL TIEMPO', w / 2, h * 0.11, h * 0.062, '#f2efe8', SERIF, h * 0.016);
-        label(ctx, '× Caradekid', w / 2, h * 0.19, h * 0.032, 'rgba(242,239,232,0.7)', `italic ${SERIF}`);
+        label(ctx, 'ATRAPANDO EL TIEMPO', w / 2, h * 0.11, h * 0.056, '#f2efe8', DISPLAY, h * 0.012);
+        label(ctx, '× Caradekid', w / 2, h * 0.185, h * 0.03, 'rgba(242,239,232,0.7)', LIGHT, h * 0.004);
         const t = at(10, 10);
         E.renderWatch(ctx, w * 0.17, h * 0.63, h * 0.235, cfgOf('seventies'), false, t);
         E.renderWatch(ctx, w * 0.83, h * 0.63, h * 0.235, cfgOf('cocktail'), false, t);
@@ -63,8 +68,8 @@
         const head = 170, foot = 40, w = cols * cell, h = head + rows * (cell + 56) + foot;
         const c = canvas(w, h), ctx = c.getContext('2d');
         scene(ctx, w, h, false, 'studio', w / 2, h * 0.4, w * 0.35);
-        label(ctx, `${ids.length} ESFERAS · ${ids.length} DIALS`, w / 2, 70, 46, '#2a2620', SERIF, 12);
-        label(ctx, 'Japón · Suiza · España', w / 2, 125, 28, 'rgba(42,38,32,0.65)', `italic ${SERIF}`);
+        label(ctx, `${ids.length} ESFERAS · ${ids.length} DIALS`, w / 2, 70, 42, '#2a2620', DISPLAY, 8);
+        label(ctx, 'Japón · Suiza · España', w / 2, 125, 26, 'rgba(42,38,32,0.65)', LIGHT, 2);
         const t = at(10, 10);
         ids.forEach((id, i) => {
           const x = (i % cols) * cell + cell / 2, y = head + Math.floor(i / cols) * (cell + 56) + cell / 2;
@@ -83,11 +88,11 @@
         const t = at(10, 10);
         scene(hc, w / 2, h, false, 'studio', w / 4, h * 0.5, h * 0.36);
         E.renderWatch(hc, w / 4, h * 0.52, h * 0.36, cfgOf('snowfield'), false, t);
-        label(hc, 'MODO CLARO', w / 4, h * 0.075, 34, '#2a2620', SERIF, 8);
+        label(hc, 'MODO CLARO', w / 4, h * 0.075, 30, '#2a2620', DISPLAY, 6);
         ctx.drawImage(half, 0, 0);
         scene(hc, w / 2, h, true, 'studio', w / 4, h * 0.5, h * 0.36);
         E.renderWatch(hc, w / 4, h * 0.52, h * 0.36, cfgOf('snowfield'), true, t);
-        label(hc, 'MODO OSCURO', w / 4, h * 0.075, 34, '#f2efe8', SERIF, 8);
+        label(hc, 'MODO OSCURO', w / 4, h * 0.075, 30, '#f2efe8', DISPLAY, 6);
         ctx.drawImage(half, w / 2, 0);
         return png(c);
       },
@@ -100,7 +105,7 @@
         times.forEach(([hh, mm, name], i) => {
           const x = w * (0.125 + i * 0.25), y = h * 0.45;
           E.renderWatch(ctx, x, y, h * 0.33, cfgOf('datum', { light: 'time' }), hh >= 21, at(hh, mm, 20));
-          label(ctx, name, x, h * 0.88, 34, '#2a2620', SERIF);
+          label(ctx, name, x, h * 0.88, 32, '#2a2620', DISPLAY);
           label(ctx, `${hh}:${String(mm).padStart(2, '0')}`, x, h * 0.94, 24, 'rgba(42,38,32,0.55)', SANS);
         });
         return png(c);
@@ -128,7 +133,7 @@
           ctx.clip();
           ctx.drawImage(tile, x, y);
           ctx.restore();
-          label(ctx, name, x + size / 2, y + size + 46, 30, 'rgba(242,239,232,0.85)', SERIF);
+          label(ctx, name, x + size / 2, y + size + 46, 28, 'rgba(242,239,232,0.85)', DISPLAY);
         });
         return png(c);
       },
