@@ -62,7 +62,7 @@ git clone https://github.com/caradekid/atrapando-el-tiempo.git
 cd atrapando-el-tiempo && make install
 ```
 
-`make install` builds a universal app (Apple Silicon + Intel), copies it to `/Applications/Atrapando el Tiempo.app` and opens it. The channel logo appears in the menu bar:
+`make install` builds a universal app (Apple Silicon + Intel), copies it to `/Applications/Atrapando el Tiempo.app` (or `~/Applications` if `/Applications` isn't writable) and opens it. The channel logo appears in the menu bar:
 
 - **Live Wallpaper** — turns the live dial on or off
 - **Settings…** — editor with a live preview

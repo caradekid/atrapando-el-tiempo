@@ -48,10 +48,12 @@ $(APP): $(APP_SRC) native/App/Info.plist $(WEB) $(SAVER)
 run: app
 	open $(APP)
 
+# Installs to /Applications when writable, otherwise to ~/Applications.
 install: app
-	rm -rf "/Applications/$(APP_NAME).app" /Applications/Tourbillon.app
-	cp -R $(APP) "/Applications/$(APP_NAME).app"
-	open "/Applications/$(APP_NAME).app"
+	@dest=/Applications; [ -w "$$dest" ] || { dest="$(HOME)/Applications"; mkdir -p "$$dest"; }; \
+	rm -rf "$$dest/$(APP_NAME).app" "$$dest/Tourbillon.app"; \
+	cp -R $(APP) "$$dest/$(APP_NAME).app" && echo "Installed in $$dest/$(APP_NAME).app" && \
+	open "$$dest/$(APP_NAME).app"
 
 install-saver: saver
 	mkdir -p "$(HOME)/Library/Screen Savers"
