@@ -206,7 +206,7 @@
     bgLight: '#ece9e3',
     bgDark: '#0d0e10',
     position: 'center',
-    size: 0.62,
+    size: 0.53,
     fps: 60,
   };
 
