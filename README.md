@@ -1,125 +1,125 @@
 <p align="center">
-  <img src="docs/hero.jpg" alt="Atrapando el tiempo × CARADEKID: tres esferas de reloj fotorrealistas">
+  <img src="docs/hero.jpg" alt="Atrapando el tiempo × CARADEKID: three photorealistic watch dials">
 </p>
 
 <h1 align="center">Atrapando el tiempo × CARADEKID</h1>
 
 <p align="center">
-  <b>Esferas de reloj vivas y fotorrealistas como fondo de pantalla para Mac y PC.</b><br>
-  Marcan la hora real, cambian con la luz del día y funcionan sin conexión.
+  <b>Live, photorealistic watch dials as your wallpaper, on Mac and PC.</b><br>
+  They show the real time, change with the daylight and work offline.
 </p>
 
 <p align="center">
-  <a href="https://github.com/caradekid/atrapando-el-tiempo/releases/latest"><img alt="Descargar" src="https://img.shields.io/github/v/release/caradekid/atrapando-el-tiempo?label=descargar&style=for-the-badge&color=8a6a3b"></a>
+  <a href="https://github.com/caradekid/atrapando-el-tiempo/releases/latest"><img alt="Download" src="https://img.shields.io/github/v/release/caradekid/atrapando-el-tiempo?label=download&style=for-the-badge&color=8a6a3b"></a>
   <img alt="macOS 13+" src="https://img.shields.io/badge/macOS-13%2B-1c1c1e?style=for-the-badge&logo=apple">
   <img alt="Windows" src="https://img.shields.io/badge/Windows-Lively-1c1c1e?style=for-the-badge&logo=windows">
-  <img alt="Licencia MIT" src="https://img.shields.io/badge/c%C3%B3digo-MIT-1c1c1e?style=for-the-badge">
+  <img alt="MIT licence" src="https://img.shields.io/badge/code-MIT-1c1c1e?style=for-the-badge">
 </p>
 
 <p align="center">
-  Un regalo de <a href="https://www.instagram.com/caradekid.jpg/"><b>CARADEKID</b></a> para el canal <a href="https://www.youtube.com/@AtrapandoelTiempo"><b>Atrapando el tiempo</b></a> y su comunidad.<br>
-  <sub><a href="README.en.md">English version</a></sub>
+  A gift from <a href="https://www.instagram.com/caradekid.jpg/"><b>CARADEKID</b></a> to the <a href="https://www.youtube.com/@AtrapandoelTiempo"><b>Atrapando el tiempo</b></a> channel and its community.<br>
+  <sub>English · <a href="README.es.md">Español</a></sub>
 </p>
 
 ---
 
-## ✦ Qué es
+## ✦ What it is
 
-Un fondo de pantalla que es un reloj de verdad. Eliges una esfera inspirada en los grandes clásicos japoneses, suizos y españoles, y queda en tu escritorio marcando la hora de tu ordenador, con el segundero moviéndose como el del reloj real: deslizándose en un Spring Drive, a pequeños saltos en un automático o con el tic del cuarzo.
+A wallpaper that is a real watch. Pick a dial inspired by the great Japanese, Swiss and Spanish classics and it sits on your desktop showing your computer's time, with the seconds hand moving like the real one: gliding like a Spring Drive, in small steps like an automatic, or ticking like quartz.
 
-Todo se dibuja en tiempo real, sin imágenes: texturas en relieve calculadas en la tarjeta gráfica, índices tallados como gemas, agujas pulidas que brillan al girar, lume que se ilumina por la noche y un cristal de zafiro con sus reflejos. Cada esfera lleva el medallón del canal.
+Everything is drawn live, with no images: textured surfaces lit on the GPU, gem-cut indices, polished hands that flash as they turn, lume that glows at night and a sapphire crystal with its reflections. Every dial carries the channel's medallion.
 
-<p align="center"><img src="docs/macro.jpg" alt="Detalles en macro: tapisserie, textura de nieve y lume dorado"></p>
+<p align="center"><img src="docs/macro.jpg" alt="Macro details: tapisserie, snow texture and gilt lume"></p>
 
-## ✦ La colección
+## ✦ The collection
 
-22 esferas, de las de vestir a las de buceo, pasando por cronógrafos, pilotos y relojes de campo. Cada una con sus colores, su forma de aguja y su ritmo de segundero.
+22 dials, from dress watches to divers, chronographs, pilots and field watches, each with its own colours, hands and seconds rhythm.
 
-<p align="center"><img src="docs/collection.jpg" alt="Las 22 esferas de la colección"></p>
+<p align="center"><img src="docs/collection.jpg" alt="All 22 dials in the collection"></p>
 
-| Origen | Esferas |
+| Origin | Dials |
 | --- | --- |
-| 🇯🇵 Japón | **Snowfield** (textura de nieve, reserva de marcha, segundero azulado) · **Birch** (corteza de abedul) · **Cocktail** (rayos en surcos) · **Shell Diver** (buceo, día y fecha) · **Seventies** (plata de los 70 en dos zonas) |
-| 🇨🇭 Suiza | **Submersible** · **GMT** · **Moon Chrono** (con el «punto sobre el 90») · **Datum** · **Calatrava** · **Octagon** (tapisserie) · **Guilloché** (con tourbillon) · **Pilot** · **Skeleton** · **Wave Diver** · **Gilt Diver** · **Slide Rule** · **Crosshair** · **Field** · **Expedition** |
-| 🇪🇸 España | **Racing Chrono** · **Mediterráneo** (buzo vintage *compressor*) |
+| 🇯🇵 Japan | **Snowfield** (snow texture, power reserve, blued seconds) · **Birch** (birch bark) · **Cocktail** (grooved sunray) · **Shell Diver** (diver, day-date) · **Seventies** (two-zone 70s silver) |
+| 🇨🇭 Switzerland | **Submersible** · **GMT** · **Moon Chrono** (with the "dot over 90") · **Datum** · **Calatrava** · **Octagon** (tapisserie) · **Guilloché** (with tourbillon) · **Pilot** · **Skeleton** · **Wave Diver** · **Gilt Diver** · **Slide Rule** · **Crosshair** · **Field** · **Expedition** |
+| 🇪🇸 Spain | **Racing Chrono** · **Mediterráneo** (vintage compressor diver) |
 
-> Los diseños están *inspirados* en estilos conocidos. No reproducen nombres ni logotipos de marcas de relojes: la firma de la esfera es la que tú escribas.
+> The designs are *inspired by* well-known styles. They don't reproduce watch brand names or logos: the signature on the dial is whatever you type.
 
-## ✦ Luz viva
+## ✦ Living light
 
-La luz sigue la hora del día: por la mañana entra por la izquierda, a mediodía desde arriba, al atardecer desde la derecha con un tono ámbar, y de noche es una lámpara cálida de escritorio. Al mover el ratón, la luz gira como si inclinaras el reloj bajo una lámpara, y los reflejos recorren la esfera, las agujas y el cristal.
+The light follows the time of day: from the left in the morning, from above at noon, amber from the right at sunset, and a warm desk lamp at night. Moving the mouse turns the light as if you tilted the watch under a lamp, sweeping reflections across the dial, hands and crystal.
 
-<p align="center"><img src="docs/hours.jpg" alt="La misma esfera por la mañana, a mediodía, al atardecer y de noche"></p>
+<p align="center"><img src="docs/hours.jpg" alt="The same dial in the morning, at noon, at sunset and at night"></p>
 
-## ✦ Claro y oscuro
+## ✦ Light and dark
 
-Sigue el modo claro u oscuro del sistema. Cada esfera puede tener su versión de noche, y el lume brilla en la oscuridad.
+It follows the system's light or dark mode. Each dial can have its own night version, and the lume glows in the dark.
 
-<p align="center"><img src="docs/lightdark.jpg" alt="La misma esfera en modo claro y en modo oscuro"></p>
+<p align="center"><img src="docs/lightdark.jpg" alt="The same dial in light and dark mode"></p>
 
-## ✦ Instalación
+## ✦ Install
 
 ### 🍎 Mac
 
-1. **[Descarga el `.dmg`](https://github.com/caradekid/atrapando-el-tiempo/releases/latest)** y ábrelo.
-2. Arrastra **Atrapando el Tiempo** a **Aplicaciones** y ábrela. El logo del canal aparece en la barra de menús.
-3. **La primera vez**, macOS avisa de que no puede verificar al desarrollador (es un regalo gratuito, sin certificado de pago de Apple):
-   - **macOS 15 o posterior:** intenta abrirla, cierra el aviso y ve a **Ajustes del Sistema → Privacidad y seguridad → Abrir igualmente**.
-   - **macOS 13 y 14:** clic derecho en la app → **Abrir** → **Abrir**.
+1. **[Download the `.dmg`](https://github.com/caradekid/atrapando-el-tiempo/releases/latest)** and open it.
+2. Drag **Atrapando el Tiempo** onto **Applications** and open it. The channel logo appears in the menu bar.
+3. **The first time**, macOS warns that it can't verify the developer (it's a free gift, not signed with a paid Apple certificate):
+   - **macOS 15 or later:** try to open it, close the warning, then go to **System Settings → Privacy & Security → Open Anyway**.
+   - **macOS 13 and 14:** right-click the app → **Open** → **Open**.
 
-Desde la barra de menús puedes:
+From the menu bar you can:
 
-- encender o apagar el **fondo vivo**
-- abrir los **Ajustes**, con vista previa en directo
-- poner la esfera en la **pantalla de inicio de sesión y bloqueo** (imagen clara y oscura)
-- instalar el **salvapantallas**, que muestra el reloj animado
-- abrir la app **al iniciar sesión**
-- visitar el canal **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**
+- turn the **live wallpaper** on or off
+- open **Settings**, with a live preview
+- put the dial on the **login and lock screen** (light and dark image)
+- install the **screen saver**, which shows the animated watch
+- **open at login**
+- visit the **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)** channel
 
-Necesita macOS 13 o posterior; funciona en Apple Silicon e Intel.
+Requires macOS 13 or later; runs on Apple Silicon and Intel.
 
 ### 🪟 Windows
 
-En Windows funciona con **[Lively Wallpaper](https://www.rocksdanister.com/lively/)**, una app gratuita (también en Microsoft Store):
+On Windows it runs in **[Lively Wallpaper](https://www.rocksdanister.com/lively/)**, a free app (also in the Microsoft Store):
 
-1. Descarga **`Atrapando-el-Tiempo-Lively-….zip`** desde la [última versión](https://github.com/caradekid/atrapando-el-tiempo/releases/latest).
-2. Arrástralo a Lively (o **+ Añadir fondo** → elige el archivo) y ponlo como fondo.
-3. En **Personalizar** eliges reloj, colores, tamaño, medallón, luz y más. Lively también puede usarlo como salvapantallas y lo pausa cuando juegas a pantalla completa.
+1. Download **`Atrapando-el-Tiempo-Lively-….zip`** from the [latest release](https://github.com/caradekid/atrapando-el-tiempo/releases/latest).
+2. Drag it into Lively (or **+ Add wallpaper** → choose the file) and set it as your wallpaper.
+3. Use **Customise** to pick the watch, colours, size, medallion, light and more. Lively can also run it as a screen saver and pauses it while you play fullscreen.
 
-En Windows las tipografías usan las del sistema (Bahnschrift, Segoe UI, Palatino), así que las letras cambian un poco respecto al Mac.
+On Windows the lettering uses built-in typefaces (Bahnschrift, Segoe UI, Palatino), so it looks slightly different from the Mac.
 
-## ✦ Personaliza tu reloj
+## ✦ Make it yours
 
-Esfera de día y de noche, metal de agujas e índices, anillo exterior, fecha, segundero central, tourbillon en cualquier esfera, lume, medallón AET, firma y tipografía, fondo (estudio, foco o liso) con sus colores, posición, tamaño (muy pequeño, pequeño, mediano o grande), luz (hora del día o estudio) y fluidez (60, 30 o 15 fps para ahorrar batería).
+Day and night dial, metal for hands and indices, outer ring, date, central seconds, a tourbillon on any dial, lume, AET medallion, signature and typeface, background (studio, spotlight or solid) and its colours, position, size (very small, small, medium or large), light (time of day or studio) and smoothness (60, 30 or 15 fps to save battery).
 
-## ✦ Para curiosos
+## ✦ For the curious
 
 <details>
-<summary><b>Cómo está hecho</b></summary>
+<summary><b>How it's made</b></summary>
 
-- Un único motor web (Canvas 2D + WebGL) dibuja la esfera en el escritorio, el salvapantallas, la imagen de inicio de sesión, el editor y Windows, así que se ve igual en todas partes.
-- La superficie de la esfera se calcula en la GPU con un *shader*: relieve, metal cepillado con brillo anisotrópico en los rayos de sol, destellos en la nieve y un *softbox* reflejado en la laca. Si no hay WebGL, usa texturas calculadas en la CPU.
-- El fondo se calcula píxel a píxel con un grano fino, para que los degradados oscuros no hagan escalones.
-- La app de Mac está escrita en Swift (AppKit + WebKit) y no necesita conexión.
+- One web engine (Canvas 2D + WebGL) draws the dial on the desktop, the screen saver, the login image, the editor and on Windows, so it looks the same everywhere.
+- The dial surface is computed on the GPU in a shader: relief, brushed metal with anisotropic highlights on sunray finishes, glints in the snow and a softbox reflected in lacquer. Without WebGL it falls back to CPU textures.
+- The background is computed per pixel with a fine grain, so dark gradients never band.
+- The Mac app is written in Swift (AppKit + WebKit) and needs no connection.
 
 ```
-web/            Motor y editor (sin dependencias)
-  gl.js         Superficies de esfera en la GPU (GLSL)
-  engine.js     Esferas, impresión, agujas, tourbillon, luz, claro/oscuro
-  app.js        Editor y puente con la app nativa
-  wallpaper.html, lively.js   Entrada para Windows (Lively)
-native/App      App de la barra de menús (Swift)
-native/Saver    Salvapantallas (ScreenSaver.framework)
-scripts/        render.swift (PNG/HEIC) y build-lively.mjs
-docs/           Imágenes de esta página (poster.html las genera)
+web/            Engine and editor (no dependencies)
+  gl.js         GPU dial surfaces (GLSL)
+  engine.js     Dials, printing, hands, tourbillon, light, light/dark
+  app.js        Editor and native bridge
+  wallpaper.html, lively.js   Windows entry (Lively)
+native/App      Menu bar app (Swift)
+native/Saver    Screen saver (ScreenSaver.framework)
+scripts/        render.swift (PNG/HEIC) and build-lively.mjs
+docs/           Images for this page (generated by poster.html)
 ```
 
 </details>
 
 <details>
-<summary><b>Compilar desde el código</b></summary>
+<summary><b>Build from source</b></summary>
 
-Necesitas las Command Line Tools (`xcode-select --install`); no hace falta Xcode completo.
+You need the Command Line Tools (`xcode-select --install`); full Xcode isn't required.
 
 ```bash
 git clone https://github.com/caradekid/atrapando-el-tiempo.git
@@ -129,13 +129,13 @@ git clone https://github.com/caradekid/atrapando-el-tiempo.git
 cd atrapando-el-tiempo && make install
 ```
 
-- `make dmg VERSION=1.2.0` crea el `.dmg`.
-- `make lively VERSION=1.2.0` crea el paquete de Windows (necesita Node.js).
-- Al publicar una etiqueta (`git tag v1.2.0 && git push origin v1.2.0`), GitHub Actions compila ambos y crea la versión.
-- Abre `web/index.html` en un navegador para diseñar tu esfera y descargarla como PNG.
+- `make dmg VERSION=1.2.0` builds the `.dmg`.
+- `make lively VERSION=1.2.0` builds the Windows package (needs Node.js).
+- Pushing a tag (`git tag v1.2.0 && git push origin v1.2.0`) makes GitHub Actions build both and publish a release.
+- Open `web/index.html` in a browser to design your dial and download it as a PNG.
 
 </details>
 
-## ✦ Créditos
+## ✦ Credits
 
-Idea y diseño de **[CARADEKID](https://www.instagram.com/caradekid.jpg/)** para **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. El emblema del canal pertenece a Atrapando el tiempo y se usa con motivo de este regalo. El código tiene licencia MIT; el emblema no está incluido en esa licencia.
+Concept and design by **[CARADEKID](https://www.instagram.com/caradekid.jpg/)** for **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. The channel emblem belongs to Atrapando el tiempo and is used here for this gift. The code is MIT-licensed; the emblem is not covered by that licence.
