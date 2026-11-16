@@ -5,6 +5,8 @@
 APP      := build/AtrapandoElTiempo.app
 SAVER    := build/AtrapandoElTiempo.saver
 APP_NAME := Atrapando el Tiempo
+VERSION  ?= 1.0.0
+DMG      := build/Atrapando-el-Tiempo-$(VERSION).dmg
 MIN_OS   := 13.0
 ARCHS    := arm64 x86_64
 SWIFT    := swiftc -O -swift-version 5
@@ -12,7 +14,7 @@ APP_SRC  := $(wildcard native/App/*.swift)
 SAVER_SRC:= $(wildcard native/Saver/*.swift)
 WEB      := $(wildcard web/*.js web/*.css web/index.html)
 
-.PHONY: all app saver run install install-saver clean
+.PHONY: all app saver run install install-saver dmg clean
 
 all: app
 
@@ -59,6 +61,18 @@ install-saver: saver
 	mkdir -p "$(HOME)/Library/Screen Savers"
 	rm -rf "$(HOME)/Library/Screen Savers/Tourbillon.saver" "$(HOME)/Library/Screen Savers/$(APP_NAME).saver"
 	cp -R $(SAVER) "$(HOME)/Library/Screen Savers/$(APP_NAME).saver"
+
+# Distributable disk image: the app, a shortcut to Applications and a first-open guide.
+dmg: app
+	rm -rf build/dmg "$(DMG)" && mkdir -p build/dmg
+	cp -R $(APP) "build/dmg/$(APP_NAME).app"
+	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(VERSION)" "build/dmg/$(APP_NAME).app/Contents/Info.plist"
+	/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(VERSION)" "build/dmg/$(APP_NAME).app/Contents/Resources/AtrapandoElTiempo.saver/Contents/Info.plist"
+	codesign --force --sign - "build/dmg/$(APP_NAME).app" >/dev/null 2>&1 || true
+	ln -s /Applications build/dmg/Applications
+	cp "dist/How to open.txt" "build/dmg/How to open.txt"
+	hdiutil create -volname "$(APP_NAME)" -srcfolder build/dmg -ov -format UDZO "$(DMG)" >/dev/null
+	@echo "Built $(DMG)"
 
 clean:
 	rm -rf build

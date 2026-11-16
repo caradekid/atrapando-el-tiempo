@@ -62,7 +62,18 @@ All dials are procedural (no image files). Dial surfaces are rendered on the GPU
 
 ## Install
 
-You need macOS 13 or later and the Command Line Tools (`xcode-select --install`). Full Xcode is not required.
+**[Download the latest .dmg](https://github.com/caradekid/atrapando-el-tiempo/releases/latest)**, open it and drag **Atrapando el Tiempo** onto **Applications**. It needs macOS 13 or later and runs on Apple Silicon and Intel.
+
+The app is a free gift and isn't signed with a paid Apple certificate, so **the first time** macOS may say it can't verify the developer:
+
+- **macOS 15 or later:** try to open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**.
+- **macOS 13–14:** right-click the app in Applications, choose **Open**, then **Open** again.
+
+You only do this once. The `.dmg` includes a short guide in English and Spanish.
+
+### Build from source
+
+You need the Command Line Tools (`xcode-select --install`). Full Xcode is not required.
 
 ```bash
 git clone https://github.com/caradekid/atrapando-el-tiempo.git
@@ -85,6 +96,16 @@ Every change you make in Settings is applied instantly to the desktop and to the
 ### No installation
 
 Open `web/index.html` in a browser to design your dial and download it as a PNG (light and dark). `web/gallery.html` shows the whole collection.
+
+### Publishing a release
+
+Push a version tag and GitHub Actions builds the universal `.dmg` and attaches it to a new release:
+
+```bash
+git tag v1.1.0 && git push origin v1.1.0
+```
+
+`make dmg VERSION=1.1.0` builds the same `.dmg` locally in `build/`.
 
 ## Structure
 

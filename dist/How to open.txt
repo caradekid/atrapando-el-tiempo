@@ -1,0 +1,44 @@
+Atrapando el tiempo × Caradekid
+================================
+
+1. Drag "Atrapando el Tiempo" onto the Applications folder.
+2. Open it from Applications.
+
+The first time, macOS may say it cannot verify the developer, because the
+app is a free gift and is not signed with a paid Apple certificate.
+To open it anyway:
+
+  macOS 15 (Sequoia) or later
+    - Try to open the app once and close the warning.
+    - Open System Settings > Privacy & Security.
+    - Scroll down and click "Open Anyway" next to "Atrapando el Tiempo".
+    - Confirm with your password or Touch ID.
+
+  macOS 13 (Ventura) or 14 (Sonoma)
+    - Right-click (or Control-click) the app in Applications and choose Open.
+    - Click Open in the dialog.
+
+You only need to do this once. The app works offline and only lives in the
+menu bar (look for the channel logo at the top of the screen).
+
+---------------------------------------------------------------------------
+
+1. Arrastra "Atrapando el Tiempo" a la carpeta Aplicaciones.
+2. Ábrela desde Aplicaciones.
+
+La primera vez, macOS puede decir que no puede verificar al desarrollador,
+porque la app es un regalo gratuito y no está firmada con un certificado de
+pago de Apple. Para abrirla igualmente:
+
+  macOS 15 (Sequoia) o posterior
+    - Intenta abrir la app una vez y cierra el aviso.
+    - Abre Ajustes del Sistema > Privacidad y seguridad.
+    - Baja y pulsa "Abrir igualmente" junto a "Atrapando el Tiempo".
+    - Confirma con tu contraseña o Touch ID.
+
+  macOS 13 (Ventura) o 14 (Sonoma)
+    - Haz clic derecho (o Control-clic) en la app en Aplicaciones y elige Abrir.
+    - Pulsa Abrir en el diálogo.
+
+Solo hace falta la primera vez. La app funciona sin conexión y vive en la
+barra de menús (busca el logo del canal arriba en la pantalla).
