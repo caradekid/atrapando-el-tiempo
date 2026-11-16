@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dial gallery</title>
+  <style>
+    :root { --bg: #ece9e3; --ink: #2a2724; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 13px -apple-system, sans-serif; }
+    body.dark { --bg: #0d0e10; --ink: #e9e7e2; }
+    header { padding: 16px 20px; display: flex; gap: 12px; align-items: baseline; }
+    header a { color: inherit; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--cell, 260px), 1fr)); gap: 8px; padding: 0 12px 24px; }
+    figure { margin: 0; text-align: center; }
+    canvas { width: 100%; aspect-ratio: 1; display: block; }
+    figcaption { opacity: .7; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <header><strong>Dial gallery</strong> <a href="?">light</a> <a href="?dark=1">dark</a> <a href="index.html">editor</a></header>
+  <div class="grid" id="grid"></div>
+  <script src="engine.js"></script>
+  <script>
+    const E = TourbillonEngine;
+    const q = new URLSearchParams(location.search);
+    const dark = q.get('dark') === '1';
+    const only = q.get('only') ? q.get('only').split(',') : null;
+    if (q.get('cell')) document.documentElement.style.setProperty('--cell', q.get('cell') + 'px');
+    document.body.classList.toggle('dark', dark);
+    const t = new Date(); t.setHours(10, 10, 31, 0);
+    const grid = document.getElementById('grid');
+    Object.entries(E.MODELS).filter(([id]) => !only || only.includes(id)).forEach(([id, m]) => {
+      const fig = document.createElement('figure');
+      const c = document.createElement('canvas');
+      fig.append(c, Object.assign(document.createElement('figcaption'), { textContent: `${m.name} · ${m.origin}` }));
+      grid.appendChild(fig);
+      requestAnimationFrame(() => {
+        const px = Math.round(c.clientWidth * devicePixelRatio);
+        c.width = c.height = px;
+        const ctx = c.getContext('2d');
+        E.renderWatch(ctx, px / 2, px / 2, px * 0.46, Object.assign({}, E.DEFAULTS, m.defaults, { model: id }), dark, t);
+      });
+    });
+  </script>
+</body>
+</html>
