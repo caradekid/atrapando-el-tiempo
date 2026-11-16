@@ -44,16 +44,16 @@ const properties = {
   position: dropdown('Position', ['Centre', 'Left', 'Right'], 0),
   size: dropdown('Watch size', ['Very small', 'Small', 'Medium', 'Large'], 2),
   fps: dropdown('Frame rate', ['Smooth (60)', 'Balanced (30)', 'Eco (15)'], 0),
-  credits: { type: 'label', value: 'Atrapando el tiempo × Caradekid' },
+  credits: { type: 'label', value: 'Atrapando el tiempo × CARADEKID' },
 };
 
 const info = {
   AppVersion: '2.1.0.0',
-  Title: 'Atrapando el tiempo × Caradekid',
+  Title: 'Atrapando el tiempo × CARADEKID',
   Thumbnail: 'thumbnail.jpg',
   Preview: 'thumbnail.jpg',
-  Desc: `Live, photorealistic watch-dial wallpaper with the real time: ${modelIds.length} dials inspired by Japanese, Swiss and Spanish classics, light that follows the time of day and the cursor, light and dark mode. Works offline. A gift from Caradekid (https://www.instagram.com/caradekid.jpg/) to Atrapando el tiempo (https://www.youtube.com/@AtrapandoelTiempo) · v${version}`,
-  Author: 'Caradekid',
+  Desc: `Live, photorealistic watch-dial wallpaper with the real time: ${modelIds.length} dials inspired by Japanese, Swiss and Spanish classics, light that follows the time of day and the cursor, light and dark mode. Works offline. A gift from CARADEKID (https://www.instagram.com/caradekid.jpg/) to Atrapando el tiempo (https://www.youtube.com/@AtrapandoelTiempo) · v${version}`,
+  Author: 'CARADEKID',
   License: 'MIT (code). The channel emblem belongs to Atrapando el tiempo.',
   Contact: 'https://github.com/caradekid/atrapando-el-tiempo',
   Type: 1,

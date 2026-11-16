@@ -1,4 +1,4 @@
-# Atrapando el tiempo x Caradekid
+# Atrapando el tiempo x CARADEKID
 # Builds the menu bar app (live wallpaper) with the screen saver bundled inside.
 # Needs only the Xcode Command Line Tools (xcode-select --install).
 

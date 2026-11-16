@@ -16,7 +16,7 @@ final class ConfigStore {
            let data = try? Data(contentsOf: legacy),
            var object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
             object["wordmark"] = "ATRAPANDO EL TIEMPO"
-            object["subline"] = "x Caradekid"
+            object["subline"] = "x CARADEKID"
             object["emblem"] = "medallion"
             if let out = try? JSONSerialization.data(withJSONObject: object) { try? out.write(to: current) }
         }

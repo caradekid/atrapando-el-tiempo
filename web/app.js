@@ -1,5 +1,5 @@
 /*
- * Atrapando el tiempo × Caradekid — page controller.
+ * Atrapando el tiempo × CARADEKID — page controller.
  * Modes: "settings" (editor with live preview), "wallpaper" and "saver" (full-screen scene).
  * The native shell injects window.TB_BOOT = { mode, config, native } before this script runs.
  * In a plain browser the editor opens and settings are kept in localStorage.
@@ -160,7 +160,7 @@
       h('div', { class: 'stage-bar' },
         h('div', { class: 'brand' },
           h('a', { href: CHANNEL, target: '_blank', rel: 'noopener', onclick: openExternal, title: 'Atrapando el tiempo on YouTube' }, 'Atrapando el tiempo'),
-          h('small', {}, '× ', h('a', { href: CREATOR, target: '_blank', rel: 'noopener', onclick: openExternal, title: 'Caradekid on Instagram' }, 'Caradekid'), ' · live watch wallpaper · works offline')),
+          h('small', {}, '× ', h('a', { href: CREATOR, target: '_blank', rel: 'noopener', onclick: openExternal, title: 'CARADEKID on Instagram' }, 'CARADEKID'), ' · live watch wallpaper · works offline')),
         h('div', { class: 'row' }, h('span', { class: 'sub-label', style: 'margin:0' }, 'Preview'), previewSeg)),
       h('div', { class: 'preview-wrap' }, previewHost),
       h('div', { class: 'stage-foot' }, 'Light and dark follow macOS automatically when Appearance is set to Auto.'),

@@ -25,7 +25,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.button?.image = ChannelLogo.menuBarImage()
-        statusItem.button?.toolTip = "Atrapando el tiempo × Caradekid"
+        statusItem.button?.toolTip = "Atrapando el tiempo × CARADEKID"
         let menu = NSMenu()
         menu.delegate = self
         statusItem.menu = menu

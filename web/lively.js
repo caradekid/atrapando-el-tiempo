@@ -1,5 +1,5 @@
 /*
- * Atrapando el tiempo × Caradekid — bridge for Lively Wallpaper (Windows).
+ * Atrapando el tiempo × CARADEKID — bridge for Lively Wallpaper (Windows).
  *
  * Lively calls window.livelyPropertyListener(name, value) once per property when the
  * wallpaper loads and again whenever the user changes one in its customise panel.

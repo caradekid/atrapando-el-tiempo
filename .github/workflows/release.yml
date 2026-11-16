@@ -45,5 +45,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" build/*.dmg build/*Lively*.zip \
-            --title "Atrapando el tiempo × Caradekid ${GITHUB_REF_NAME}" \
+            --title "Atrapando el tiempo × CARADEKID ${GITHUB_REF_NAME}" \
             --notes-file dist/release-notes.md

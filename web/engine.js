@@ -1,5 +1,5 @@
 /*
- * Atrapando el tiempo × Caradekid — watch dial rendering engine.
+ * Atrapando el tiempo × CARADEKID — watch dial rendering engine.
  * Pure Canvas 2D. No network, no external assets, system fonts only.
  *
  * Coordinates: origin at the watch centre, y grows downwards.
@@ -242,7 +242,7 @@
     lume: true,
     emblem: 'medallion',
     wordmark: 'ATRAPANDO EL TIEMPO',
-    subline: 'x Caradekid',
+    subline: 'x CARADEKID',
     font: 'didot',
     appearance: 'auto',
     background: 'studio',

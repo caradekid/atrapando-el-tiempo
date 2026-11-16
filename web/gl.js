@@ -1,5 +1,5 @@
 /*
- * Atrapando el tiempo × Caradekid — GPU dial surfaces.
+ * Atrapando el tiempo × CARADEKID — GPU dial surfaces.
  *
  * Renders a dial's surface (texture, relief and lighting) in a fragment shader:
  * procedural height fields lit with a moving key light, anisotropic highlights for
