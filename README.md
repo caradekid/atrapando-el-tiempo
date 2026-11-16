@@ -51,7 +51,7 @@ All dials are procedural (no image files): textures computed pixel by pixel with
 You need macOS 13 or later and the Command Line Tools (`xcode-select --install`). Full Xcode is not required.
 
 ```bash
-git clone https://github.com/<user>/tourbillon-wallpaper.git
+git clone https://github.com/caradekid/tourbillon-wallpaper.git
 ```
 
 ```bash
