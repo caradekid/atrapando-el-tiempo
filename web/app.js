@@ -206,8 +206,14 @@
 
     const wordmark = h('input', { type: 'text', maxlength: 24, placeholder: 'Your signature', oninput: (e) => update({ wordmark: e.target.value }) });
     const subline = h('input', { type: 'text', maxlength: 32, placeholder: 'Second line', oninput: (e) => update({ subline: e.target.value }) });
-    const emblemSeg = segmented('emblem', [['medallion', 'Medallion'], ['printed', 'Printed'], ['none', 'Off']]);
-    syncs.push((c) => emblemSeg._sync(c.emblem));
+    const emblemSeg = segmented('emblem', [['monogram', 'Text'], ['medallion', 'Logo'], ['printedText', 'Printed'], ['none', 'Off']]);
+    const emblemText = h('input', { type: 'text', maxlength: 5, placeholder: 'AET', oninput: (e) => update({ emblemText: e.target.value }) });
+    const emblemTextRow = h('div', { class: 'row' }, h('label', {}, 'Emblem text'), emblemText);
+    syncs.push((c) => {
+      emblemSeg._sync(c.emblem === 'printed' ? 'printedText' : c.emblem);
+      if (document.activeElement !== emblemText) emblemText.value = c.emblemText;
+      emblemTextRow.style.display = c.emblem === 'monogram' || c.emblem === 'printedText' ? '' : 'none';
+    });
     const fontSel = h('select', { onchange: (e) => update({ font: e.target.value }) },
       Object.entries(E.FONTS).map(([k, f]) => h('option', { value: k }, f.name)));
     syncs.push((c) => {
@@ -276,7 +282,7 @@
       section('Dial', dialSw, h('div', { class: 'sub-label' }, 'Dial at night (dark mode)'), nightSw),
       section('Hands & indices', matSw, bezelBlock),
       section('Complications', ...toggles),
-      section('Signature', row('Channel emblem', emblemSeg), row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
+      section('Signature', row('Channel emblem', emblemSeg), emblemTextRow, row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
       section('Scene',
         row('Appearance', appearanceSeg),
         row('Background', bgSeg),
