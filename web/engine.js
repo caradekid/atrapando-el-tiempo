@@ -132,7 +132,7 @@
     },
     moonChrono: {
       name: 'Moon Chrono', origin: 'Switzerland', note: 'Matte black, three registers, tachymeter',
-      bezel: 'tachy', texture: 'matte', indices: 'baton', hands: 'baton', secondsHand: 'needle', whiteSeconds: true,
+      bezel: 'tachy', texture: 'matte', indices: 'baton', hands: 'baton', secondsHand: 'needle', whiteSeconds: true, dotOver90: true, stepDial: true,
       motion: 'beat6', subdials: 3, sport: true,
       defaults: { dial: 'black', material: 'steel', tourbillon: false, nightDial: 'same' },
     },
@@ -288,6 +288,76 @@
     return g;
   }
 
+  /* ------------------------------------------------------------------ light */
+  // One key light from the upper left (about 10:45). Polished facets take their brightness
+  // from how directly they face it, so hands flash and dim as they turn, like the real thing.
+  const KEY = Math.atan2(-0.6, 0.8);  // clockwise from 12
+
+  function facetLight(normalAngle) {
+    return 0.5 + 0.5 * Math.cos(normalAngle - KEY);
+  }
+
+  // Mirror polish: dark unless it catches the light, then a hot specular.
+  function facetColor(mat, normalAngle) {
+    const t = Math.pow(facetLight(normalAngle), 1.7);
+    return t < 0.5 ? mix(mat.lo, mat.mid, t * 2) : mix(mat.mid, mat.hi, (t - 0.5) * 2);
+  }
+
+  // A facet reflects a long softbox: a bright band runs along it.
+  function facetGradient(ctx, mat, normalAngle, x0, y0, x1, y1) {
+    const c = facetColor(mat, normalAngle);
+    const b = facetLight(normalAngle);
+    const g = ctx.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, mix(c, '#000000', 0.12));
+    g.addColorStop(0.42, c);
+    g.addColorStop(0.6, mix(c, '#ffffff', 0.18 + b * 0.35));
+    g.addColorStop(0.78, c);
+    g.addColorStop(1, mix(c, '#000000', 0.18));
+    return g;
+  }
+
+  // Canvas shadows are in device pixels; scale them so they look the same on every display.
+  function ctxScale(ctx) {
+    const m = ctx.getTransform();
+    return Math.hypot(m.a, m.b) || 1;
+  }
+
+  // Shadows fall away from the key light (down and to the right).
+  function castShadow(ctx, color, blur, dist) {
+    const k = ctxScale(ctx);
+    ctx.shadowColor = color;
+    ctx.shadowBlur = blur * k;
+    ctx.shadowOffsetX = dist * 0.55 * k;
+    ctx.shadowOffsetY = dist * 0.85 * k;
+  }
+
+  function noShadow(ctx) {
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+  }
+
+  // Raised lume: a little dome of luminous paint with a soft rim.
+  function lumePaint(ctx, env, x0, y0, x1, y1, glow) {
+    const g = ctx.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, mix(env.lume, '#ffffff', 0.35));
+    g.addColorStop(0.5, env.lume);
+    g.addColorStop(1, mix(env.lume, '#000000', env.lumeGlow ? 0.05 : 0.14));
+    ctx.save();
+    if (env.lumeGlow) {
+      ctx.shadowColor = rgba(env.lume, 0.85);
+      ctx.shadowBlur = glow * ctxScale(ctx);
+      ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
+    } else noShadow(ctx);
+    ctx.fillStyle = g;
+    ctx.fill();
+    noShadow(ctx);
+    ctx.strokeStyle = env.lumeGlow ? rgba(env.lume, 0.4) : 'rgba(0,0,0,0.18)';
+    ctx.lineWidth = Math.max(0.4, glow * 0.06);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function spacedText(ctx, text, x, y, spacing) {
     const chars = [...text];
     const widths = chars.map((c) => ctx.measureText(c).width);
@@ -408,6 +478,18 @@
       ctx.fillStyle = gr;
       ctx.fill();
     }
+    // ceramic / aluminium insert sheen towards the light
+    ctx.save();
+    ctx.lineWidth = (r2 - r1) * 0.85;
+    for (let i = 0; i < 20; i++) {
+      const a0 = KEY - 1.1 + (i / 20) * 2.2;
+      const w = Math.pow(Math.cos(((i + 0.5) / 20 - 0.5) * Math.PI), 2);
+      ctx.strokeStyle = `rgba(255,255,255,${0.07 * w})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, (r1 + r2) / 2, a0 - Math.PI / 2, a0 + 2.2 / 20 + 0.003 - Math.PI / 2);
+      ctx.stroke();
+    }
+    ctx.restore();
     const ink = luminance(bz.top) > 0.6 ? '#1a1a1c' : '#efece3';
     const mid = (r1 + r2) / 2;
     const fs = (r2 - r1) * 0.5;
@@ -499,6 +581,8 @@
         ctx.rotate(a);
         ctx.fillText(String(v), 0, -mid - fs * 0.15);
         ctx.fillRect(-R * 0.003, -r1 - fs * 0.05, R * 0.006, fs * 0.28);
+        // the collectors' "dot over 90" of the early moon chronographs
+        if (v === 90 && model.dotOver90) { circle(ctx, 0, -mid - fs * 0.62, fs * 0.09); ctx.fill(); }
         ctx.restore();
       });
     }
@@ -538,10 +622,10 @@
         const n = fbm(x + w, y * 1.25 + w, 4);
         return 1 - Math.abs(n * 2 - 1);
       };
-      const X = u * 34, Y = v * 34, e = 0.05;
+      const X = u * 40, Y = v * 40, e = 0.05;
       const h0 = h(X, Y);
       const dx = (h(X + e, Y) - h0) / e, dy = (h(X, Y + e) - h0) / e;
-      const lit = (dx * -LX + dy * -LY) * -0.038;
+      const lit = (dx * -LX + dy * -LY) * -0.03;
       const spark = hash2(Math.floor(u * ctx.px), Math.floor(v * ctx.px)) > 0.9985 ? 0.25 : 0;
       return [1 + lit + (h0 - 0.5) * 0.05, Math.max(0, lit) * 0.35 + spark];
     },
@@ -579,9 +663,15 @@
       const side = slope * Math.sin(th - LIGHT_THETA);
       return [0.86 + groove * 0.1 + aniso * 0.45 + side * 0.12, aniso * 0.18 + Math.max(0, side) * 0.08];
     },
-    gloss(u, v, r) {
+    gloss(u, v, r, th, ctx) {
       const d = (u + 0.32) * (u + 0.32) + (v + 0.42) * (v + 0.42);
-      return [1 + Math.exp(-d * 4) * 0.25, Math.exp(-d * 9) * 0.05];
+      // rotated rectangle, upper left, with feathered edges
+      const ca = Math.cos(0.62), sa = Math.sin(0.62);
+      const x = (u + 0.36) * ca + (v + 0.4) * sa, y = -(u + 0.36) * sa + (v + 0.4) * ca;
+      const edge = (q, half, soft) => Math.min(1, Math.max(0, (half - Math.abs(q)) / soft));
+      const box = edge(x, 0.34, 0.05) * edge(y, 0.09, 0.03);
+      const k = ctx.lightDial ? 0.04 : 0.085;
+      return [1 + Math.exp(-d * 4) * 0.2, Math.exp(-d * 9) * 0.03 + box * k];
     },
     matte(u, v, r, th, ctx) {
       const n = hash2(Math.floor(u * ctx.px * 0.7), Math.floor(v * ctx.px * 0.7)) - 0.5;
@@ -652,6 +742,19 @@
       const scale = ctx.getTransform().a || 1;
       const tex = dialTexture(pattern, dial, Rd * 2 * scale);
       ctx.drawImage(tex, -Rd, -Rd, Rd * 2, Rd * 2);
+      if (model.stepDial) {
+        const rs = Rd * 0.875;
+        ctx.lineWidth = Rd * 0.006;
+        ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+        circle(ctx, Rd * 0.002, Rd * 0.004, rs); ctx.stroke();
+        ctx.lineWidth = Rd * 0.003;
+        const lip = ctx.createLinearGradient(-Rd, -Rd, Rd, Rd);
+        lip.addColorStop(0, 'rgba(255,255,255,0.22)');
+        lip.addColorStop(0.5, 'rgba(255,255,255,0.03)');
+        lip.addColorStop(1, 'rgba(255,255,255,0.12)');
+        ctx.strokeStyle = lip;
+        circle(ctx, -Rd * 0.002, -Rd * 0.003, rs - Rd * 0.004); ctx.stroke();
+      }
     } else if (pattern === 'tapisserie') {
       const cell = Rd / 15;
       const px = Math.max(8, Math.round(cell * (ctx.getTransform().a || 1)));
@@ -685,7 +788,7 @@
       circle(ctx, 0, 0, rr);
       ctx.clip();
       ctx.lineWidth = Rd * 0.0022;
-      ctx.strokeStyle = env.lightDial ? 'rgba(0,0,0,0.13)' : 'rgba(255,255,255,0.10)';
+      ctx.strokeStyle = env.lightDial ? 'rgba(0,0,0,0.19)' : 'rgba(255,255,255,0.13)';
       const n = 150;
       for (let i = 0; i < n; i++) {
         const a = (i / n) * TAU;
@@ -844,46 +947,44 @@
     ctx.restore();
   }
 
-  function appliedBar(ctx, env, x0, y0, w, h, lume) {
+  // Applied index cut like a gem: two long facets meeting on a ridge plus two end bevels.
+  // `ang` is the index's position on the dial, so each one catches the light differently.
+  function appliedBar(ctx, env, x0, y0, w, h, lume, ang) {
     const { mat } = env;
+    ang = ang || 0;
+    const x1 = x0 + w, xm = x0 + w / 2;
+    const e = Math.min(w * 0.55, h * 0.16);
+    const outline = () => { ctx.beginPath(); ctx.rect(x0, y0, w, h); };
+    // ambient and contact shadows
     ctx.save();
-    ctx.shadowColor = env.dark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.35)';
-    ctx.shadowBlur = w * 0.6;
-    ctx.shadowOffsetX = w * 0.15;
-    ctx.shadowOffsetY = w * 0.3;
-    ctx.beginPath();
-    ctx.roundRect(x0, y0, w, h, w * 0.08);
     ctx.fillStyle = mat.mid;
-    ctx.fill();
+    castShadow(ctx, env.dark ? 'rgba(0,0,0,0.45)' : 'rgba(40,30,20,0.22)', w * 1.6, w * 0.9);
+    outline(); ctx.fill();
+    castShadow(ctx, env.dark ? 'rgba(0,0,0,0.75)' : 'rgba(30,20,10,0.38)', w * 0.35, w * 0.28);
+    outline(); ctx.fill();
     ctx.restore();
-    // two polished facets meeting on a ridge, the left one catching the key light
-    ctx.save();
-    ctx.beginPath();
-    ctx.roundRect(x0, y0, w, h, w * 0.08);
-    ctx.clip();
-    const lg = ctx.createLinearGradient(x0, y0, x0 + w * 0.5, y0 + h);
-    lg.addColorStop(0, mat.hi);
-    lg.addColorStop(1, mix(mat.hi, mat.mid, 0.5));
-    ctx.fillStyle = lg;
-    ctx.fillRect(x0, y0, w / 2, h);
-    const rg = ctx.createLinearGradient(x0 + w, y0, x0 + w * 0.5, y0 + h);
-    rg.addColorStop(0, mat.lo);
-    rg.addColorStop(1, mix(mat.lo, mat.mid, 0.4));
-    ctx.fillStyle = rg;
-    ctx.fillRect(x0 + w / 2, y0, w / 2, h);
-    ctx.fillStyle = rgba('#ffffff', env.dark ? 0.35 : 0.7);
-    ctx.fillRect(x0 + w / 2 - w * 0.03, y0, w * 0.06, h);
-    ctx.fillStyle = rgba('#ffffff', 0.5);
-    ctx.fillRect(x0, y0, w, Math.max(0.5, w * 0.08));
-    ctx.restore();
-    if (lume) {
-      ctx.save();
+    const facet = (pts, normal, gx0, gy0, gx1, gy1) => {
       ctx.beginPath();
-      ctx.roundRect(x0 + w * 0.25, y0 + w * 0.25, w * 0.5, h - w * 0.5, w * 0.1);
-      ctx.fillStyle = env.lume;
-      if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = w * 1.2; }
+      pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.closePath();
+      ctx.fillStyle = facetGradient(ctx, mat, normal, gx0, gy0, gx1, gy1);
       ctx.fill();
-      ctx.restore();
+    };
+    facet([[x0, y0], [xm, y0 + e], [xm, y0 + h - e], [x0, y0 + h]], ang - Math.PI / 2, x0, y0, x0, y0 + h);
+    facet([[x1, y0], [xm, y0 + e], [xm, y0 + h - e], [x1, y0 + h]], ang + Math.PI / 2, x1, y0, x1, y0 + h);
+    facet([[x0, y0], [x1, y0], [xm, y0 + e]], ang, x0, y0, x1, y0);
+    facet([[x0, y0 + h], [x1, y0 + h], [xm, y0 + h - e]], ang + Math.PI, x0, y0, x1, y0);
+    // ridge glint and crisp edges
+    ctx.strokeStyle = rgba('#ffffff', 0.25 + facetLight(ang) * 0.45);
+    ctx.lineWidth = Math.max(0.35, w * 0.035);
+    ctx.beginPath(); ctx.moveTo(xm, y0 + e); ctx.lineTo(xm, y0 + h - e); ctx.stroke();
+    ctx.strokeStyle = rgba(mat.edge, 0.45);
+    ctx.lineWidth = Math.max(0.35, w * 0.03);
+    outline(); ctx.stroke();
+    if (lume) {
+      ctx.beginPath();
+      ctx.roundRect(x0 + w * 0.26, y0 + e * 0.9, w * 0.48, h - e * 1.8, w * 0.12);
+      lumePaint(ctx, env, x0, y0, x1, y0 + h, w * 1.4);
     }
   }
 
@@ -917,10 +1018,10 @@
         ctx.save();
         ctx.rotate(a);
         if (h === 0) {
-          appliedBar(ctx, env, -w * 1.35, -r2, w, r2 - r1, model.sport);
-          appliedBar(ctx, env, w * 0.35, -r2, w, r2 - r1, model.sport);
+          appliedBar(ctx, env, -w * 1.35, -r2, w, r2 - r1, model.sport, a);
+          appliedBar(ctx, env, w * 0.35, -r2, w, r2 - r1, model.sport, a);
         } else {
-          appliedBar(ctx, env, -w / 2, -r2, w, r2 - r1, model.sport);
+          appliedBar(ctx, env, -w / 2, -r2, w, r2 - r1, model.sport, a);
         }
         ctx.restore();
       } else if (style === 'dots' || style === 'bigdots') {
@@ -931,15 +1032,11 @@
         if (env.cfg.date && h === 3) continue;
         ctx.save();
         ctx.rotate(a);
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = Rd * 0.02;
-        ctx.shadowOffsetY = Rd * 0.01;
-        ctx.fillStyle = metalConic(ctx, 0, -r, mat);
+        castShadow(ctx, env.dark ? 'rgba(0,0,0,0.65)' : 'rgba(30,20,10,0.32)', Rd * 0.018, Rd * 0.012);
+        ctx.fillStyle = metalConic(ctx, 0, -r, mat, -a);
         const lume = () => {
-          ctx.fillStyle = env.lume;
-          if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = Rd * 0.05; ctx.shadowOffsetY = 0; }
-          else { ctx.shadowColor = 'transparent'; }
-          ctx.fill();
+          noShadow(ctx);
+          lumePaint(ctx, env, -Rd * 0.05, -r - Rd * 0.05, Rd * 0.05, -r + Rd * 0.05, Rd * 0.06);
         };
         if (h === 0) {
           const s = Rd * 0.085;
@@ -1281,8 +1378,9 @@
     ctx.fillStyle = ink;
     if (env.model.racing) {
       ring(ctx, 0, 0, s.r * 0.93, s.r);
-      ctx.fillStyle = s.kind === 'min' ? '#e0262b' : s.kind === 'sec' ? '#f2f0ea' : '#1f3d8a';
+      ctx.fillStyle = s.kind === 'min' ? '#e0262b' : s.kind === 'sec' ? '#f2f0ea' : '#c9a24a';
       ctx.fill('evenodd');
+      ctx.fillStyle = ink;
     }
     const n = s.kind === '24h' ? 24 : s.kind === 'min' ? 30 : s.kind === 'hour' ? 12 : 60;
     for (let i = 0; i < n; i++) {
@@ -1559,203 +1657,149 @@
   }
 
   /* ------------------------------------------------------------------- hands */
-  function handFill(ctx, env, style, L) {
-    if (style === 'blued') {
-      const g = ctx.createLinearGradient(-L * 0.04, 0, L * 0.04, 0);
-      g.addColorStop(0, '#5476d8');
-      g.addColorStop(0.5, '#22408f');
-      g.addColorStop(1, '#14275e');
-      return g;
-    }
-    if (style === 'ink') return env.dial.ink;
-    return metalLinear(ctx, -L * 0.05, 0, L * 0.05, 0, env.mat);
-  }
+  /* ------------------------------------------------------------------- hands */
+  // Each style is an outline (pointing up, pivot at 0,0), how it is finished, and an optional lume plate.
+  const BLUED = { hi: '#7d9cf5', mid: '#2b4db4', lo: '#0e1f5c', edge: '#0a1640' };
+
+  const HANDS = {
+    dauphine: (L, W) => ({
+      path(c) { c.moveTo(0, -L); c.lineTo(-W / 2, -L * 0.1); c.lineTo(0, L * 0.12); c.lineTo(W / 2, -L * 0.1); c.closePath(); },
+      finish: 'facets',
+    }),
+    faceted: (L, W) => ({
+      path(c) {
+        c.moveTo(-W * 0.5, L * 0.1); c.lineTo(-W * 0.5, -L * 0.86); c.lineTo(0, -L);
+        c.lineTo(W * 0.5, -L * 0.86); c.lineTo(W * 0.5, L * 0.1); c.lineTo(0, L * 0.14); c.closePath();
+      },
+      finish: 'facets',
+    }),
+    baton: (L, W) => ({
+      path(c) {
+        c.moveTo(-W / 2, L * 0.15); c.lineTo(-W / 2, -L * 0.96); c.lineTo(0, -L);
+        c.lineTo(W / 2, -L * 0.96); c.lineTo(W / 2, L * 0.15); c.closePath();
+      },
+      finish: 'facets',
+      lume(c) { c.roundRect(-W * 0.26, -L * 0.93, W * 0.52, L * 0.68, W * 0.14); },
+    }),
+    sword: (L, W) => ({
+      path(c) {
+        c.moveTo(-W * 0.22, L * 0.12); c.lineTo(-W * 0.5, -L * 0.72); c.lineTo(0, -L);
+        c.lineTo(W * 0.5, -L * 0.72); c.lineTo(W * 0.22, L * 0.12); c.closePath();
+      },
+      finish: 'facets',
+      lume(c) {
+        c.moveTo(-W * 0.14, -L * 0.18); c.lineTo(-W * 0.32, -L * 0.7); c.lineTo(0, -L * 0.9);
+        c.lineTo(W * 0.32, -L * 0.7); c.lineTo(W * 0.14, -L * 0.18); c.closePath();
+      },
+    }),
+    pilot: (L, W) => Object.assign(HANDS.sword(L, W), { finish: 'pilot' }),
+    arrow: (L, W) => ({
+      path(c) {
+        c.moveTo(-W * 0.2, L * 0.15); c.lineTo(-W * 0.2, -L * 0.55); c.lineTo(-W * 0.62, -L * 0.6); c.lineTo(0, -L);
+        c.lineTo(W * 0.62, -L * 0.6); c.lineTo(W * 0.2, -L * 0.55); c.lineTo(W * 0.2, L * 0.15); c.closePath();
+      },
+      finish: 'facets',
+      lume(c) { c.moveTo(0, -L * 0.9); c.lineTo(-W * 0.44, -L * 0.63); c.lineTo(W * 0.44, -L * 0.63); c.closePath(); },
+    }),
+    feuille: (L, W) => ({
+      path(c) {
+        c.moveTo(0, L * 0.1); c.quadraticCurveTo(-W * 0.9, -L * 0.45, 0, -L);
+        c.quadraticCurveTo(W * 0.9, -L * 0.45, 0, L * 0.1); c.closePath();
+      },
+      finish: 'facets',
+    }),
+    breguet: (L, W, depth) => {
+      const pr = W * 0.95, py = -L * (depth > 0.5 ? 0.78 : 0.7);
+      return {
+        path(c) {
+          c.moveTo(-W * 0.18, L * 0.18); c.lineTo(-W * 0.12, py + pr * 0.8); c.lineTo(W * 0.12, py + pr * 0.8);
+          c.lineTo(W * 0.18, L * 0.18); c.closePath();
+          c.moveTo(-W * 0.12, py - pr * 0.8); c.lineTo(0, -L); c.lineTo(W * 0.12, py - pr * 0.8); c.closePath();
+          c.moveTo(pr, py); c.arc(0, py, pr, 0, TAU);
+          c.moveTo(pr * 0.62, py); c.arc(0, py, pr * 0.62, 0, TAU, true);
+        },
+        finish: 'breguet',
+      };
+    },
+    needle: (L, W) => ({
+      path(c) { c.roundRect(-W * 0.5, -L, W, L * 1.25, W * 0.5); c.moveTo(W * 2, L * 0.2); c.arc(0, L * 0.2, W * 2, 0, TAU); },
+      finish: 'accent',
+    }),
+    lollipop: (L, W) => ({
+      path(c) { c.roundRect(-W * 0.5, -L, W, L * 1.25, W * 0.5); c.moveTo(W * 3.2, -L * 0.72); c.arc(0, -L * 0.72, W * 3.2, 0, TAU); },
+      finish: 'accent',
+      lume(c) { c.arc(0, -L * 0.72, W * 2.4, 0, TAU); },
+    }),
+    gmt: (L, W) => ({
+      path(c) {
+        c.roundRect(-W * 0.5, -L * 0.88, W, L * 0.9, W * 0.3);
+        c.moveTo(0, -L); c.lineTo(-W * 3.2, -L * 0.84); c.lineTo(W * 3.2, -L * 0.84); c.closePath();
+      },
+      finish: 'gmt',
+      lume(c) { c.moveTo(0, -L * 0.97); c.lineTo(-W * 2.1, -L * 0.865); c.lineTo(W * 2.1, -L * 0.865); c.closePath(); },
+    }),
+    sub: (L, W) => ({
+      path(c) { c.roundRect(-W * 0.5, -L, W, L * 1.2, W * 0.5); },
+      finish: 'sub',
+    }),
+  };
 
   function drawHand(ctx, env, kind, L, W, angle, depth) {
-    const { mat } = env;
+    const shape = HANDS[kind](L, W, depth);
+    let finish = shape.finish;
+    if (finish === 'pilot') finish = env.lightDial ? 'blued' : 'facets';
+    if (finish === 'breguet') finish = env.lightDial ? 'blued' : 'facets';
+    const rule = kind === 'breguet' ? 'evenodd' : 'nonzero';
+    const outline = () => { ctx.beginPath(); shape.path(ctx); };
+
     ctx.save();
     ctx.rotate(angle);
-    ctx.shadowColor = env.dark ? 'rgba(0,0,0,0.7)' : 'rgba(30,20,10,0.35)';
-    ctx.shadowBlur = W * (1 + depth);
-    ctx.shadowOffsetX = W * 0.25 * depth;
-    ctx.shadowOffsetY = W * 0.45 * depth;
-    const lumeFill = () => {
+    // the higher the hand sits above the dial, the further and softer its shadow
+    const dist = L * 0.011 * (1 + depth * 2.2);
+    ctx.fillStyle = '#000';
+    castShadow(ctx, env.dark ? 'rgba(0,0,0,0.5)' : 'rgba(35,25,15,0.2)', dist * 2.4, dist * 1.4);
+    outline(); ctx.fill(rule);
+    castShadow(ctx, env.dark ? 'rgba(0,0,0,0.7)' : 'rgba(30,20,10,0.32)', dist * 0.45, dist * 0.45);
+    outline(); ctx.fill(rule);
+    noShadow(ctx);
+
+    if (finish === 'facets' || finish === 'blued') {
+      const mat = finish === 'blued' ? BLUED : env.mat;
       ctx.save();
-      ctx.shadowColor = env.lumeGlow ? env.lume : 'transparent';
-      ctx.shadowBlur = env.lumeGlow ? W * 2 : 0;
-      ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
-      ctx.fillStyle = env.lume;
-      ctx.fill();
+      outline();
+      ctx.clip(rule);
+      ctx.fillStyle = facetGradient(ctx, mat, angle - Math.PI / 2, 0, L * 0.2, 0, -L);
+      ctx.fillRect(-W * 4, -L * 1.1, W * 4, L * 1.5);
+      ctx.fillStyle = facetGradient(ctx, mat, angle + Math.PI / 2, 0, L * 0.2, 0, -L);
+      ctx.fillRect(0, -L * 1.1, W * 4, L * 1.5);
+      // ridge glint along the spine
+      ctx.fillStyle = rgba('#ffffff', 0.2 + facetLight(angle) * 0.5);
+      ctx.fillRect(-W * 0.022, -L, W * 0.044, L * 1.2);
       ctx.restore();
-    };
-    switch (kind) {
-      case 'dauphine': {
-        // faceted: two halves catch the light differently
-        ctx.beginPath();
-        ctx.moveTo(0, -L); ctx.lineTo(-W / 2, -L * 0.1); ctx.lineTo(0, L * 0.12); ctx.lineTo(W / 2, -L * 0.1); ctx.closePath();
-        ctx.fillStyle = mat.mid;
-        ctx.fill();
-        ctx.shadowColor = 'transparent';
-        ctx.beginPath();
-        ctx.moveTo(0, -L); ctx.lineTo(-W / 2, -L * 0.1); ctx.lineTo(0, L * 0.12); ctx.closePath();
-        ctx.fillStyle = mat.hi; ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(0, -L); ctx.lineTo(W / 2, -L * 0.1); ctx.lineTo(0, L * 0.12); ctx.closePath();
-        ctx.fillStyle = mix(mat.lo, mat.mid, 0.3); ctx.fill();
-        break;
-      }
-      case 'faceted': {
-        // razor-sharp, mirror-polished: two flat planes meeting on a central ridge
-        const half = (side) => {
-          ctx.beginPath();
-          ctx.moveTo(0, L * 0.14);
-          ctx.lineTo(side * W * 0.5, L * 0.1);
-          ctx.lineTo(side * W * 0.5, -L * 0.86);
-          ctx.lineTo(0, -L);
-          ctx.closePath();
-        };
-        ctx.beginPath();
-        ctx.moveTo(-W * 0.5, L * 0.1); ctx.lineTo(-W * 0.5, -L * 0.86); ctx.lineTo(0, -L);
-        ctx.lineTo(W * 0.5, -L * 0.86); ctx.lineTo(W * 0.5, L * 0.1); ctx.lineTo(0, L * 0.14); ctx.closePath();
-        ctx.fillStyle = mat.mid;
-        ctx.fill();
-        ctx.shadowColor = 'transparent';
-        half(-1);
-        const l = ctx.createLinearGradient(0, -L, 0, L * 0.1);
-        l.addColorStop(0, mat.hi); l.addColorStop(0.6, mix(mat.hi, mat.mid, 0.3)); l.addColorStop(1, mat.hi);
-        ctx.fillStyle = l; ctx.fill();
-        half(1);
-        const r = ctx.createLinearGradient(0, -L, 0, L * 0.1);
-        r.addColorStop(0, mat.lo); r.addColorStop(0.5, mix(mat.lo, mat.mid, 0.5)); r.addColorStop(1, mat.lo);
-        ctx.fillStyle = r; ctx.fill();
-        ctx.fillStyle = 'rgba(255,255,255,0.75)';
-        ctx.fillRect(-W * 0.025, -L * 0.98, W * 0.05, L * 1.1);
-        break;
-      }
-      case 'arrow': {
-        // broad arrowhead hour hand with a big lume plate
-        ctx.beginPath();
-        ctx.moveTo(-W * 0.2, L * 0.15);
-        ctx.lineTo(-W * 0.2, -L * 0.55);
-        ctx.lineTo(-W * 0.62, -L * 0.6);
-        ctx.lineTo(0, -L);
-        ctx.lineTo(W * 0.62, -L * 0.6);
-        ctx.lineTo(W * 0.2, -L * 0.55);
-        ctx.lineTo(W * 0.2, L * 0.15);
-        ctx.closePath();
-        ctx.fillStyle = handFill(ctx, env, 'metal', L);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(0, -L * 0.9); ctx.lineTo(-W * 0.44, -L * 0.63); ctx.lineTo(W * 0.44, -L * 0.63); ctx.closePath();
-        lumeFill();
-        break;
-      }
-      case 'baton': {
-        ctx.beginPath();
-        ctx.roundRect(-W / 2, -L, W, L * 1.15, W * 0.15);
-        ctx.fillStyle = handFill(ctx, env, 'metal', L);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.roundRect(-W * 0.26, -L * 0.94, W * 0.52, L * 0.68, W * 0.1);
-        lumeFill();
-        break;
-      }
-      case 'sword':
-      case 'pilot': {
-        ctx.beginPath();
-        ctx.moveTo(-W * 0.22, L * 0.12);
-        ctx.lineTo(-W * 0.5, -L * 0.72);
-        ctx.lineTo(0, -L);
-        ctx.lineTo(W * 0.5, -L * 0.72);
-        ctx.lineTo(W * 0.22, L * 0.12);
-        ctx.closePath();
-        ctx.fillStyle = kind === 'pilot' && env.lightDial ? handFill(ctx, env, 'blued', L) : handFill(ctx, env, 'metal', L);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(-W * 0.14, -L * 0.18);
-        ctx.lineTo(-W * 0.32, -L * 0.7);
-        ctx.lineTo(0, -L * 0.91);
-        ctx.lineTo(W * 0.32, -L * 0.7);
-        ctx.lineTo(W * 0.14, -L * 0.18);
-        ctx.closePath();
-        lumeFill();
-        break;
-      }
-      case 'breguet': {
-        const blued = env.lightDial;
-        ctx.fillStyle = handFill(ctx, env, blued ? 'blued' : 'metal', L);
-        const pr = W * 0.95, py = -L * (depth > 0.5 ? 0.78 : 0.7);
-        ctx.beginPath();
-        ctx.moveTo(-W * 0.18, L * 0.18);
-        ctx.lineTo(-W * 0.12, py + pr);
-        ctx.lineTo(W * 0.12, py + pr);
-        ctx.lineTo(W * 0.18, L * 0.18);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(-W * 0.12, py - pr);
-        ctx.lineTo(0, -L);
-        ctx.lineTo(W * 0.12, py - pr);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(0, py, pr, 0, TAU);
-        ctx.arc(0, py, pr * 0.62, 0, TAU, true);
-        ctx.fill('evenodd');
-        break;
-      }
-      case 'feuille': {
-        ctx.beginPath();
-        ctx.moveTo(0, L * 0.1);
-        ctx.quadraticCurveTo(-W * 0.9, -L * 0.45, 0, -L);
-        ctx.quadraticCurveTo(W * 0.9, -L * 0.45, 0, L * 0.1);
-        ctx.closePath();
-        ctx.fillStyle = handFill(ctx, env, 'metal', L);
-        ctx.fill();
-        ctx.shadowColor = 'transparent';
-        ctx.beginPath();
-        ctx.moveTo(0, L * 0.1); ctx.quadraticCurveTo(-W * 0.9, -L * 0.45, 0, -L); ctx.closePath();
-        ctx.fillStyle = rgba(mat.hi, 0.35);
-        ctx.fill();
-        break;
-      }
-      case 'needle':
-      case 'lollipop': {
-        ctx.fillStyle = env.accent;
-        ctx.beginPath();
-        ctx.roundRect(-W * 0.5, -L, W, L * 1.25, W * 0.5);
-        ctx.fill();
-        if (kind === 'lollipop') {
-          circle(ctx, 0, -L * 0.72, W * 3.2);
-          ctx.fill();
-          circle(ctx, 0, -L * 0.72, W * 2.4);
-          lumeFill();
-        } else {
-          circle(ctx, 0, L * 0.2, W * 2);
-          ctx.fill();
-        }
-        break;
-      }
-      case 'gmt': {
-        ctx.fillStyle = env.model.sport ? '#d23a2c' : env.accent;
-        ctx.beginPath();
-        ctx.roundRect(-W * 0.5, -L * 0.88, W, L * 0.9, W * 0.3);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(0, -L); ctx.lineTo(-W * 3.2, -L * 0.84); ctx.lineTo(W * 3.2, -L * 0.84); ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(0, -L * 0.97); ctx.lineTo(-W * 2.1, -L * 0.865); ctx.lineTo(W * 2.1, -L * 0.865); ctx.closePath();
-        lumeFill();
-        break;
-      }
-      case 'sub': {
-        ctx.fillStyle = luminance(env.dial.sub) > 0.5 ? '#151517' : '#f1efe9';
-        ctx.beginPath();
-        ctx.roundRect(-W * 0.5, -L, W, L * 1.2, W * 0.5);
-        ctx.fill();
-        break;
-      }
+      outline();
+      ctx.strokeStyle = rgba(mat.edge, 0.55);
+      ctx.lineWidth = Math.max(0.3, W * 0.03);
+      ctx.stroke();
+    } else {
+      const base = finish === 'sub' ? (luminance(env.dial.sub) > 0.5 ? '#151517' : '#f1efe9')
+        : finish === 'gmt' ? '#d23a2c' : env.accent;
+      outline();
+      ctx.fillStyle = base;
+      ctx.fill(rule);
+      // painted hands still have a slight sheen on the lit side
+      ctx.save();
+      outline();
+      ctx.clip(rule);
+      ctx.fillStyle = rgba('#ffffff', 0.12 * facetLight(angle - Math.PI / 2));
+      ctx.fillRect(-W * 5, -L * 1.1, W * 5, L * 1.5);
+      ctx.fillStyle = rgba('#000000', 0.18 * (1 - facetLight(angle + Math.PI / 2)));
+      ctx.fillRect(0, -L * 1.1, W * 5, L * 1.5);
+      ctx.restore();
+    }
+    if (shape.lume) {
+      ctx.beginPath();
+      shape.lume(ctx);
+      lumePaint(ctx, env, -W, -L, W, 0, W * 2.2);
     }
     ctx.restore();
   }
@@ -1827,43 +1871,83 @@
     drawHand(ctx, env, kind === 'arrow' ? 'sword' : kind, Rd * (model.indices === 'dots' ? 0.86 : 0.84), Rd * widths[1], mA, 0.75);
     const showCentral = model.subdials || cfg.centralSeconds;
     if (showCentral) drawHand(ctx, env, model.secondsHand, Rd * 0.9, Rd * 0.011, sA, 1);
-    // cannon pinion cap
-    circle(ctx, 0, 0, Rd * 0.035);
-    ctx.fillStyle = showCentral ? env.accent : metalConic(ctx, 0, 0, env.mat);
+    // centre stack: a polished cap with a bevelled rim, then the seconds pinion
+    ctx.save();
+    castShadow(ctx, env.dark ? 'rgba(0,0,0,0.6)' : 'rgba(30,20,10,0.3)', Rd * 0.012, Rd * 0.008);
+    circle(ctx, 0, 0, Rd * 0.036);
+    ctx.fillStyle = showCentral ? env.accent : metalConic(ctx, 0, 0, env.mat, 0.4);
     ctx.fill();
-    circle(ctx, 0, 0, Rd * 0.012);
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    noShadow(ctx);
+    circle(ctx, 0, 0, Rd * 0.026);
+    ctx.fillStyle = showCentral ? mix(env.accent, '#000000', 0.15) : metalConic(ctx, 0, 0, env.mat, -1.2);
     ctx.fill();
+    circle(ctx, 0, 0, Rd * 0.009);
+    ctx.fillStyle = metalConic(ctx, 0, 0, MATERIALS.steel, 0.8);
+    ctx.fill();
+    circle(ctx, -Rd * 0.008, -Rd * 0.01, Rd * 0.006);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fill();
+    ctx.restore();
   }
 
   /* ------------------------------------------------------------------- glass */
   function drawGlass(ctx, env, g) {
     const Rd = g.Rd;
+    const dark = env.dark;
     ctx.save();
-    circle(ctx, 0, 0, Rd * 1.01);
+    circle(ctx, 0, 0, Rd * 1.005);
     ctx.clip();
-    // rehaut shadow
-    const rh = ctx.createRadialGradient(0, 0, Rd * 0.9, 0, 0, Rd * 1.01);
+    // rehaut: the dial edge sits in the shadow of the case wall, deeper on the far side
+    const rh = ctx.createRadialGradient(-Rd * 0.04, -Rd * 0.06, Rd * 0.86, 0, 0, Rd * 1.01);
     rh.addColorStop(0, 'rgba(0,0,0,0)');
-    rh.addColorStop(1, env.dark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.12)');
+    rh.addColorStop(1, dark ? 'rgba(0,0,0,0.38)' : 'rgba(0,0,0,0.16)');
     ctx.fillStyle = rh;
     ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
-    // sapphire highlight
+    // broad sheen from the domed sapphire
     ctx.beginPath();
-    ctx.ellipse(-Rd * 0.25, -Rd * 0.45, Rd * 0.85, Rd * 0.42, -0.5, 0, TAU);
-    const hl = ctx.createLinearGradient(-Rd, -Rd, Rd * 0.1, Rd * 0.1);
-    hl.addColorStop(0, `rgba(255,255,255,${env.dark ? 0.07 : 0.16})`);
+    ctx.ellipse(-Rd * 0.28, -Rd * 0.5, Rd * 0.95, Rd * 0.45, -0.55, 0, TAU);
+    const hl = ctx.createLinearGradient(-Rd * 0.8, -Rd * 0.9, Rd * 0.1, Rd * 0.05);
+    hl.addColorStop(0, `rgba(255,255,255,${dark ? 0.06 : 0.12})`);
     hl.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = hl;
     ctx.fill();
-    // anti-reflective bloom
-    const ar = ctx.createRadialGradient(Rd * 0.55, Rd * 0.6, 0, Rd * 0.55, Rd * 0.6, Rd * 0.7);
-    ar.addColorStop(0, env.dark ? 'rgba(120,110,255,0.06)' : 'rgba(140,130,255,0.05)');
-    ar.addColorStop(1, 'rgba(120,110,255,0)');
+    // softbox window reflected in the crystal: a feathered ellipse, fainter over dark dials
+    ctx.save();
+    ctx.rotate(-0.62);
+    ctx.translate(-Rd * 0.05, -Rd * 0.66);
+    ctx.scale(1, 0.17);
+    const strength = env.lightDial ? (dark ? 0.05 : 0.09) : (dark ? 0.025 : 0.04);
+    const win = ctx.createRadialGradient(0, 0, 0, 0, 0, Rd * 0.45);
+    win.addColorStop(0, `rgba(255,255,255,${strength})`);
+    win.addColorStop(0.55, `rgba(255,255,255,${strength * 0.8})`);
+    win.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = win;
+    circle(ctx, 0, 0, Rd * 0.45);
+    ctx.fill();
+    ctx.restore();
+    // anti-reflective coating: a faint violet-blue bloom opposite the light
+    const ar = ctx.createRadialGradient(Rd * 0.5, Rd * 0.58, 0, Rd * 0.5, Rd * 0.58, Rd * 0.75);
+    ar.addColorStop(0, dark ? 'rgba(110,105,255,0.07)' : 'rgba(130,120,255,0.05)');
+    ar.addColorStop(1, 'rgba(110,105,255,0)');
     ctx.fillStyle = ar;
     ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
     ctx.restore();
+    // crisp light along the crystal's bevelled edge, strongest towards the light
+    ctx.save();
+    ctx.lineCap = 'round';
+    const k = Math.max(0.6, Rd * 0.004);
+    ctx.lineWidth = k;
+    for (let i = 0; i < 24; i++) {
+      const a0 = KEY - 1.3 + (i / 24) * 2.6, a1 = a0 + 2.6 / 24 + 0.002;
+      const w = Math.pow(Math.cos(((i + 0.5) / 24 - 0.5) * Math.PI), 2);
+      ctx.strokeStyle = `rgba(255,255,255,${(dark ? 0.22 : 0.45) * w})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, Rd * 0.996, a0 - Math.PI / 2, a1 - Math.PI / 2);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
+
 
   /* ------------------------------------------------------------ composition */
   function drawStatic(ctx, R, env, g) {
