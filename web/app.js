@@ -44,6 +44,8 @@
       if (scene) scene.setConfig(config);
       if (ui) ui.refresh();
     },
+    /** Cursor position from the native shell: -1…1 relative to the screen centre. */
+    pointer(x, y) { if (scene) scene.setPointer(x, y); },
     pause() { if (scene) scene.pause(); },
     resume() { if (scene) scene.resume(); },
     /** Returns a base64 PNG (no data: prefix) of the full scene at a fixed, photogenic 10:10:31. */
@@ -57,6 +59,8 @@
     toast(msg) { if (ui) ui.toast(msg); },
     actionDone(name, msg) { if (ui) ui.actionDone(name, msg); },
     getConfig() { return config; },
+    /** The live scene, for debugging from the console. */
+    get scene() { return scene; },
   };
 
   /* ------------------------------------------------------- scene modes */
@@ -220,6 +224,8 @@
     const bgSeg = segmented('background', [['studio', 'Studio'], ['spotlight', 'Spotlight'], ['solid', 'Solid']]);
     const posSeg = segmented('position', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']]);
     const fpsSeg = segmented('fps', [[60, 'Smooth'], [30, 'Balanced'], [15, 'Eco']]);
+    const lightSeg = segmented('light', [['time', 'Time of day'], ['fixed', 'Studio']]);
+    const parallaxToggle = toggle('parallax', 'Tilt with the cursor');
     const bgLight = h('input', { type: 'color', oninput: (e) => update({ bgLight: e.target.value }), 'aria-label': 'Light background' });
     const bgDark = h('input', { type: 'color', oninput: (e) => update({ bgDark: e.target.value }), 'aria-label': 'Dark background' });
     // watch diameter as a share of the screen height
@@ -227,6 +233,7 @@
     const sizeSeg = segmented('size', SIZES);
     sizeSeg.classList.add('seg-full');
     syncs.push((c) => {
+      lightSeg._sync(c.light); parallaxToggle._sync();
       appearanceSeg._sync(c.appearance); bgSeg._sync(c.background); posSeg._sync(c.position); fpsSeg._sync(c.fps);
       bgLight.value = c.bgLight; bgDark.value = c.bgDark;
       const near = SIZES.reduce((best, [v]) => (Math.abs(v - c.size) < Math.abs(best - c.size) ? v : best), SIZES[0][0]);
@@ -279,6 +286,8 @@
       section('Signature', row('AET', emblemSeg), row('Text', wordmark), row('Second line', subline), row('Typeface', fontSel)),
       section('Scene',
         row('Appearance', appearanceSeg),
+        row('Light', lightSeg),
+        parallaxToggle,
         row('Background', bgSeg),
         row('Light / dark colour', h('span', { class: 'row', style: 'gap:8px' }, bgLight, bgDark)),
         row('Position', posSeg),
@@ -291,6 +300,11 @@
     app.appendChild(h('div', { class: 'settings' }, stage, panel));
 
     scene = new E.Scene(previewHost, {});
+    previewHost.addEventListener('mousemove', (e) => {
+      const r = previewHost.getBoundingClientRect();
+      scene.setPointer(((e.clientX - r.left) / r.width) * 2 - 1, ((e.clientY - r.top) / r.height) * 2 - 1);
+    });
+    previewHost.addEventListener('mouseleave', () => scene.setPointer(0, 0));
     scene.setConfig(config);
     scene.start();
 

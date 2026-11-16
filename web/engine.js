@@ -209,6 +209,8 @@
     position: 'center',
     size: 0.5,
     fps: 60,
+    light: 'time',
+    parallax: true,
   };
 
   function normalizeConfig(cfg) {
@@ -222,6 +224,8 @@
     if (!['medallion', 'printed', 'none'].includes(c.emblem)) c.emblem = DEFAULTS.emblem;
     c.size = clamp(Number(c.size) || DEFAULTS.size, 0.2, 0.9);
     c.fps = Number(c.fps) === 30 ? 30 : Number(c.fps) === 15 ? 15 : 60;
+    if (c.light !== 'fixed') c.light = 'time';
+    c.parallax = c.parallax !== false;
     c.wordmark = String(c.wordmark ?? '').slice(0, 24);
     c.subline = String(c.subline ?? '').slice(0, 32);
     return c;
@@ -291,7 +295,49 @@
   /* ------------------------------------------------------------------ light */
   // One key light from the upper left (about 10:45). Polished facets take their brightness
   // from how directly they face it, so hands flash and dim as they turn, like the real thing.
-  const KEY = Math.atan2(-0.6, 0.8);  // clockwise from 12
+  // The key light can move. KEY is its direction (clockwise from 12), LX/LY the unit vector
+  // towards it in screen space. WARM tints highlights amber, POWER scales their strength.
+  const KEY0 = Math.atan2(-0.6, 0.8);   // the studio position, about 10:45
+  let KEY = KEY0;
+  let LX = -0.6, LY = -0.8;
+  let LIGHT_THETA = KEY0;                // where sunray dials flare
+  let WARM = 0, POWER = 1;
+  const AMBER = '#ffc98f';
+
+  function applyLight(light) {
+    KEY = light.angle;
+    LX = Math.sin(KEY);
+    LY = -Math.cos(KEY);
+    LIGHT_THETA = KEY;
+    WARM = light.warmth;
+    POWER = light.intensity;
+  }
+
+  function smoothstep(a, b, x) {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
+
+  // Morning light comes from the left, noon from above, evening from the right in amber;
+  // after dark a warm desk lamp at the upper left. Quantised so layers re-render rarely.
+  function lightFor(date, mode) {
+    if (mode === 'fixed') return { angle: KEY0, warmth: 0, intensity: 1, key: 'fixed' };
+    const h = date.getHours() + date.getMinutes() / 60;
+    const t = Math.min(1, Math.max(0, (h - 6.5) / 13));
+    const sun = { angle: (t - 0.5) * 3.0, warmth: Math.pow(1 - Math.sin(t * Math.PI), 2.5), intensity: 0.82 + 0.18 * Math.sin(t * Math.PI) };
+    const lamp = { angle: KEY0, warmth: 0.55, intensity: 0.86 };
+    const w = smoothstep(6, 7, h) * (1 - smoothstep(19.5, 20.5, h));
+    const q = (v, step) => Math.round(v / step) * step;
+    const angle = q(lamp.angle + (sun.angle - lamp.angle) * w, 0.03);
+    const warmth = q(lamp.warmth + (sun.warmth - lamp.warmth) * w, 0.05);
+    const intensity = q(lamp.intensity + (sun.intensity - lamp.intensity) * w, 0.02);
+    return { angle, warmth, intensity, key: `${angle.toFixed(2)}|${warmth.toFixed(2)}|${intensity.toFixed(2)}` };
+  }
+
+  function warmWhite(alpha) {
+    const [r, g, b] = hexToRgb(mix('#ffffff', AMBER, WARM * 0.7));
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
 
   function facetLight(normalAngle) {
     return 0.5 + 0.5 * Math.cos(normalAngle - KEY);
@@ -299,8 +345,9 @@
 
   // Mirror polish: dark unless it catches the light, then a hot specular.
   function facetColor(mat, normalAngle) {
-    const t = Math.pow(facetLight(normalAngle), 1.7);
-    return t < 0.5 ? mix(mat.lo, mat.mid, t * 2) : mix(mat.mid, mat.hi, (t - 0.5) * 2);
+    const t = Math.pow(facetLight(normalAngle), 1.7) * POWER;
+    const c = t < 0.5 ? mix(mat.lo, mat.mid, t * 2) : mix(mat.mid, mat.hi, (t - 0.5) * 2);
+    return WARM > 0 ? mix(c, AMBER, WARM * 0.42 * t) : c;
   }
 
   // A facet reflects a long softbox: a bright band runs along it.
@@ -310,7 +357,7 @@
     const g = ctx.createLinearGradient(x0, y0, x1, y1);
     g.addColorStop(0, mix(c, '#000000', 0.12));
     g.addColorStop(0.42, c);
-    g.addColorStop(0.6, mix(c, '#ffffff', 0.18 + b * 0.35));
+    g.addColorStop(0.6, mix(c, mix('#ffffff', AMBER, WARM * 0.6), (0.18 + b * 0.35) * POWER));
     g.addColorStop(0.78, c);
     g.addColorStop(1, mix(c, '#000000', 0.18));
     return g;
@@ -327,8 +374,8 @@
     const k = ctxScale(ctx);
     ctx.shadowColor = color;
     ctx.shadowBlur = blur * k;
-    ctx.shadowOffsetX = dist * 0.55 * k;
-    ctx.shadowOffsetY = dist * 0.85 * k;
+    ctx.shadowOffsetX = -LX * dist * k;
+    ctx.shadowOffsetY = -LY * dist * k;
   }
 
   function noShadow(ctx) {
@@ -484,7 +531,7 @@
     for (let i = 0; i < 20; i++) {
       const a0 = KEY - 1.1 + (i / 20) * 2.2;
       const w = Math.pow(Math.cos(((i + 0.5) / 20 - 0.5) * Math.PI), 2);
-      ctx.strokeStyle = `rgba(255,255,255,${0.07 * w})`;
+      ctx.strokeStyle = warmWhite(0.07 * w * POWER);
       ctx.beginPath();
       ctx.arc(0, 0, (r1 + r2) / 2, a0 - Math.PI / 2, a0 + 2.2 / 20 + 0.003 - Math.PI / 2);
       ctx.stroke();
@@ -610,8 +657,6 @@
     return sum;
   }
 
-  const LX = -0.6, LY = -0.8;          // light direction (towards the light), screen space
-  const LIGHT_THETA = -Math.PI / 4;    // 10:30, where sunray dials flare
 
   // Each texture returns [brightness multiplier, additive white sheen] for a point.
   const TEXTURES = {
@@ -670,6 +715,10 @@
       return [0.86 + groove * 0.1 + aniso * 0.45 + side * 0.12, aniso * 0.18 + Math.max(0, side) * 0.08];
     },
     gloss(u, v, r, th, ctx) {
+      const rot = KEY - KEY0;
+      const cr = Math.cos(rot), sr = Math.sin(rot);
+      const uu = u * cr + v * sr, vv = -u * sr + v * cr;
+      u = uu; v = vv;
       const d = (u + 0.32) * (u + 0.32) + (v + 0.42) * (v + 0.42);
       // rotated rectangle, upper left, with feathered edges
       const ca = Math.cos(0.62), sa = Math.sin(0.62);
@@ -693,7 +742,7 @@
   const textureCache = new Map();
   function dialTexture(kind, dial, sizePx) {
     const px = Math.max(64, Math.min(2048, Math.round(sizePx)));
-    const key = `${kind}|${dial.a}|${dial.b}|${px}`;
+    const key = `${kind}|${dial.a}|${dial.b}|${px}|${KEY.toFixed(2)}|${WARM.toFixed(2)}|${POWER.toFixed(2)}`;
     if (textureCache.has(key)) return textureCache.get(key);
     const c = document.createElement('canvas');
     c.width = c.height = px;
@@ -703,6 +752,7 @@
     const A = hexToRgb(dial.a), B = hexToRgb(dial.b);
     const fn = TEXTURES[kind];
     const ctx = { px, lightDial: luminance(dial.a) > 0.5 };
+    const sheenRGB = hexToRgb(mix('#ffffff', AMBER, WARM * 0.7));
     for (let y = 0; y < px; y++) {
       const v = ((y + 0.5) / px) * 2 - 1;
       for (let x = 0; x < px; x++) {
@@ -717,7 +767,7 @@
         const o = (y * px + x) * 4;
         for (let ch = 0; ch < 3; ch++) {
           const base = A[ch] + (B[ch] - A[ch]) * t;
-          data[o + ch] = base * k + 255 * sheen;
+          data[o + ch] = base * k * (0.9 + 0.1 * POWER) + sheenRGB[ch] * sheen * POWER;
         }
         data[o + 3] = r > 0.996 ? Math.max(0, (1.004 - r) / 0.008) * 255 : 255;
       }
@@ -1968,11 +2018,14 @@
     rh.addColorStop(1, dark ? 'rgba(0,0,0,0.38)' : 'rgba(0,0,0,0.16)');
     ctx.fillStyle = rh;
     ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
+    // everything reflected in the crystal turns with the light
+    ctx.save();
+    ctx.rotate(KEY - KEY0);
     // broad sheen from the domed sapphire
     ctx.beginPath();
     ctx.ellipse(-Rd * 0.28, -Rd * 0.5, Rd * 0.95, Rd * 0.45, -0.55, 0, TAU);
     const hl = ctx.createLinearGradient(-Rd * 0.8, -Rd * 0.9, Rd * 0.1, Rd * 0.05);
-    hl.addColorStop(0, `rgba(255,255,255,${dark ? 0.06 : 0.12})`);
+    hl.addColorStop(0, warmWhite((dark ? 0.06 : 0.12) * POWER));
     hl.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = hl;
     ctx.fill();
@@ -1983,8 +2036,8 @@
     ctx.scale(1, 0.17);
     const strength = env.lightDial ? (dark ? 0.05 : 0.09) : (dark ? 0.025 : 0.04);
     const win = ctx.createRadialGradient(0, 0, 0, 0, 0, Rd * 0.45);
-    win.addColorStop(0, `rgba(255,255,255,${strength})`);
-    win.addColorStop(0.55, `rgba(255,255,255,${strength * 0.8})`);
+    win.addColorStop(0, warmWhite(strength * POWER));
+    win.addColorStop(0.55, warmWhite(strength * 0.8 * POWER));
     win.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = win;
     circle(ctx, 0, 0, Rd * 0.45);
@@ -1997,6 +2050,16 @@
     ctx.fillStyle = ar;
     ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
     ctx.restore();
+    // low sun or lamp: a faint amber wash from the lit side
+    if (WARM > 0.05) {
+      const lp = polar(Rd * 0.9, KEY);
+      const wash = ctx.createRadialGradient(lp.x, lp.y, 0, lp.x, lp.y, Rd * 1.9);
+      wash.addColorStop(0, `rgba(255,165,85,${0.11 * WARM})`);
+      wash.addColorStop(1, 'rgba(255,170,90,0)');
+      ctx.fillStyle = wash;
+      ctx.fillRect(-Rd, -Rd, Rd * 2, Rd * 2);
+    }
+    ctx.restore();
     // crisp light along the crystal's bevelled edge, strongest towards the light
     ctx.save();
     ctx.lineCap = 'round';
@@ -2005,7 +2068,7 @@
     for (let i = 0; i < 24; i++) {
       const a0 = KEY - 1.3 + (i / 24) * 2.6, a1 = a0 + 2.6 / 24 + 0.002;
       const w = Math.pow(Math.cos(((i + 0.5) / 24 - 0.5) * Math.PI), 2);
-      ctx.strokeStyle = `rgba(255,255,255,${(dark ? 0.22 : 0.45) * w})`;
+      ctx.strokeStyle = warmWhite((dark ? 0.22 : 0.45) * w * POWER);
       ctx.beginPath();
       ctx.arc(0, 0, Rd * 0.996, a0 - Math.PI / 2, a1 - Math.PI / 2);
       ctx.stroke();
@@ -2095,6 +2158,7 @@
     const env = makeEnv(cfg, dark, now);
     const g = geometry(env.model, R, cfg);
     const scale = ctx.getTransform().a || 1;
+    applyLight(lightFor(now, cfg.light));
     ctx.save();
     ctx.translate(cx, cy);
     drawStatic(ctx, R, env, g);
@@ -2125,6 +2189,10 @@
       this._ro.observe(host);
       this._tick = this._tick.bind(this);
       this._dayKey = '';
+      this._lightKey = '';
+      this._lightCheck = 0;
+      this.pointer = { x: 0, y: 0 };
+      this.par = { x: 0, y: 0 };
     }
     _canvas(cls) {
       const c = document.createElement('canvas');
@@ -2160,6 +2228,9 @@
       const now = this._now();
       this._dayKey = now.toDateString();
       const { R, cx, cy } = layout(this.cfg, w, h);
+      this.light = lightFor(now, this.cfg.light);
+      this._lightKey = this.light.key;
+      applyLight(this.light);
       this.env = makeEnv(this.cfg, dark, now);
       this.geo = geometry(this.env.model, R, this.cfg);
       this.center = { cx, cy, R };
@@ -2205,6 +2276,7 @@
       ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
       ctx.clearRect(0, 0, this.box * 2, this.box * 2);
       ctx.translate(this.box, this.box);
+      applyLight(this.light);
       drawDynamic(ctx, this.env, this.geo, now, this.bridge);
     }
     _tick(ts) {
@@ -2215,11 +2287,35 @@
       if (ts - this.lastFrame >= interval) {
         this.lastFrame = ts;
         const now = this._now();
-        if (now.toDateString() !== this._dayKey) this._rebuild();
+        // the light drifts slowly; re-render the static layers only when it has moved a step
+        if (ts - this._lightCheck > 15000) {
+          this._lightCheck = ts;
+          if (lightFor(now, this.cfg.light).key !== this._lightKey) this._dirty = true;
+        }
+        if (this._dirty || now.toDateString() !== this._dayKey) this._rebuild();
         else this._draw(now);
+        this._parallax();
       }
       if (this.opts.fixedTime) { this.running = false; return; }
       requestAnimationFrame(this._tick);
+    }
+    /** Cursor position relative to the watch, -1…1 on each axis. */
+    setPointer(x, y) {
+      this.pointer.x = Math.max(-1, Math.min(1, x));
+      this.pointer.y = Math.max(-1, Math.min(1, y));
+    }
+    // Tilting a watch: the crystal's reflections slide the most, the hands a little,
+    // the dial stays put. Eased so it feels physical.
+    _parallax() {
+      if (!this.center) return;
+      const target = this.cfg.parallax ? this.pointer : { x: 0, y: 0 };
+      const dx = target.x - this.par.x, dy = target.y - this.par.y;
+      if (Math.abs(dx) < 0.0005 && Math.abs(dy) < 0.0005) return;
+      this.par.x += dx * 0.12;
+      this.par.y += dy * 0.12;
+      const R = this.center.R;
+      this.live.style.transform = `translate(${(-this.par.x * R * 0.01).toFixed(2)}px, ${(-this.par.y * R * 0.01).toFixed(2)}px)`;
+      this.glass.style.transform = `translate(${(-this.par.x * R * 0.028).toFixed(2)}px, ${(-this.par.y * R * 0.028).toFixed(2)}px)`;
     }
     start() {
       if (this.running) return;
