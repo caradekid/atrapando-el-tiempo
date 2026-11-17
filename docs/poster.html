@@ -114,18 +114,19 @@
       },
 
       // Macro: textures rendered on the GPU, seen up close.
-      macro(w = 2400, h = 860) {
+      macro(w = 2400, h = 700) {
         const c = canvas(w, h), ctx = c.getContext('2d');
         scene(ctx, w, h, true, 'solid', w / 2, h / 2, h, undefined, '#0e0f11');
         const tiles = [
           ['octagon', true, 'Tapisserie', [-0.62, -0.62]],
           ['snowfield', false, T('Snow', 'Nieve'), [-0.55, -0.7]],
           ['giltDiver', true, T('Gilt and lume', 'Dorado y lume'), [-0.72, -0.35]],
+          ['octoG', false, T('Drum date', 'Fecha de tambor'), [0.6, 0]],
         ];
-        const size = 720, gap = (w - size * 3) / 4, R = 1300;
+        const size = 540, gap = (w - size * tiles.length) / (tiles.length + 1), R = 1100;
         tiles.forEach(([id, dark, name, [fx, fy]], i) => {
           const tile = canvas(size, size), tc = tile.getContext('2d');
-          tc.fillStyle = dark ? '#0e0f11' : '#ece9e3';
+          tc.fillStyle = id === 'octoG' ? '#2a2d27' : dark ? '#0e0f11' : '#ece9e3';
           tc.fillRect(0, 0, size, size);
           E.renderWatch(tc, size / 2 - fx * R, size / 2 - fy * R, R, cfgOf(id, { wordmark: '', subline: '', emblem: 'none' }), dark, at(10, 10));
           const x = gap + i * (size + gap), y = (h - size) / 2 - 20;
