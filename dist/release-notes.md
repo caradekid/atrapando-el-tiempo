@@ -1,4 +1,4 @@
-A live, photorealistic watch-dial wallpaper for Mac and PC, made by **[CARADEKID](https://www.instagram.com/caradekid.jpg/)** as a gift for **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. 22 dials inspired by Japanese, Swiss and Spanish classics, with real time, light and dark mode, light that follows the time of day, a login-screen image and a screen saver. Works offline.
+A live, photorealistic watch-dial wallpaper for Mac and PC, made by **[CARADEKID](https://www.instagram.com/caradekid.jpg/)** as a gift for **[Atrapando el tiempo](https://www.youtube.com/@AtrapandoelTiempo)**. 24 dials inspired by Japanese, Swiss and Spanish classics, with real time, light and dark mode, light that follows the time of day, a login-screen image and a screen saver. Works offline.
 
 ### Install
 

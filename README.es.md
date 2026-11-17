@@ -33,13 +33,13 @@ Todo se dibuja en tiempo real, sin imágenes: texturas en relieve calculadas en 
 
 ## ✦ La colección
 
-22 esferas, de las de vestir a las de buceo, pasando por cronógrafos, pilotos y relojes de campo. Cada una con sus colores, su forma de aguja y su ritmo de segundero.
+24 esferas, de las de vestir a las de buceo, pasando por cronógrafos, pilotos y relojes de campo. Cada una con sus colores, su forma de aguja y su ritmo de segundero.
 
-<p align="center"><img src="docs/es/collection.jpg" alt="Las 22 esferas de la colección"></p>
+<p align="center"><img src="docs/es/collection.jpg" alt="Las 24 esferas de la colección"></p>
 
 | Origen | Esferas |
 | --- | --- |
-| 🇯🇵 Japón | **Snowfield** (textura de nieve, reserva de marcha, segundero azulado) · **Birch** (corteza de abedul) · **Cocktail** (rayos en surcos) · **Shell Diver** (buceo, día y fecha) · **Seventies** (plata de los 70 en dos zonas) |
+| 🇯🇵 Japón | **Snowfield** (textura de nieve, reserva de marcha, segundero azulado) · **Birch** (corteza de abedul) · **Cocktail** (rayos en surcos) · **Shell Diver** (buceo, día y fecha) · **Seventies** (plata de los 70 en dos zonas) · **Octo G** (deportivo octogonal, fecha de tambor) · **Classic Quartz** (el cuarzo de diario) |
 | 🇨🇭 Suiza | **Submersible** · **GMT** · **Moon Chrono** (con el «punto sobre el 90») · **Datum** · **Calatrava** · **Octagon** (tapisserie) · **Guilloché** (con tourbillon) · **Pilot** · **Skeleton** · **Wave Diver** · **Gilt Diver** · **Slide Rule** · **Crosshair** · **Field** · **Expedition** |
 | 🇪🇸 España | **Racing Chrono** · **Mediterráneo** (buzo vintage *compressor*) |
 

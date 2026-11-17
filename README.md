@@ -33,13 +33,13 @@ Everything is drawn live, with no images: textured surfaces lit on the GPU, gem-
 
 ## ✦ The collection
 
-22 dials, from dress watches to divers, chronographs, pilots and field watches, each with its own colours, hands and seconds rhythm.
+24 dials, from dress watches to divers, chronographs, pilots and field watches, each with its own colours, hands and seconds rhythm.
 
-<p align="center"><img src="docs/collection.jpg" alt="All 22 dials in the collection"></p>
+<p align="center"><img src="docs/collection.jpg" alt="All 24 dials in the collection"></p>
 
 | Origin | Dials |
 | --- | --- |
-| 🇯🇵 Japan | **Snowfield** (snow texture, power reserve, blued seconds) · **Birch** (birch bark) · **Cocktail** (grooved sunray) · **Shell Diver** (diver, day-date) · **Seventies** (two-zone 70s silver) |
+| 🇯🇵 Japan | **Snowfield** (snow texture, power reserve, blued seconds) · **Birch** (birch bark) · **Cocktail** (grooved sunray) · **Shell Diver** (diver, day-date) · **Seventies** (two-zone 70s silver) · **Octo G** (octagonal sports dial, drum date) · **Classic Quartz** (the everyday quartz) |
 | 🇨🇭 Switzerland | **Submersible** · **GMT** · **Moon Chrono** (with the "dot over 90") · **Datum** · **Calatrava** · **Octagon** (tapisserie) · **Guilloché** (with tourbillon) · **Pilot** · **Skeleton** · **Wave Diver** · **Gilt Diver** · **Slide Rule** · **Crosshair** · **Field** · **Expedition** |
 | 🇪🇸 Spain | **Racing Chrono** · **Mediterráneo** (vintage compressor diver) |
 

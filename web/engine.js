@@ -61,6 +61,7 @@
     green:        { name: 'Forest green',   a: '#3a6e50', b: '#0f2d1d', ink: '#efe9db' },
     burgundy:     { name: 'Burgundy',       a: '#7c2532', b: '#330a11', ink: '#f4eae1' },
     slate:        { name: 'Slate grey',     a: '#6a717a', b: '#262b31', ink: '#f2f2f0' },
+    olive:        { name: 'Olive drab',     a: '#4d5444', b: '#2c3128', ink: '#e9ebe4' },
     black:        { name: 'Black',          a: '#2a2b2f', b: '#08080a', ink: '#f4f2ed' },
     panda:        { name: 'Panda',          a: '#f5f5f3', b: '#d6d6d2', ink: '#151517', sub: '#151618' },
     reversepanda: { name: 'Reverse panda',  a: '#1b1c1f', b: '#060607', ink: '#f2f1ec', sub: '#ecebe7' },
@@ -123,6 +124,19 @@
       bezel: 'none', texture: 'sunray', indices: 'baton', hands: 'faceted', secondsHand: 'polishedNeedle',
       track: 'radial', indexR: [0.63, 0.86], motion: 'beat6', dateAt: 3, dayDate: true,
       defaults: { dial: 'silver', material: 'steel', tourbillon: false, centralSeconds: true, date: true, nightDial: 'slate' },
+    },
+    octoG: {
+      name: 'Octo G', origin: 'Japan', note: 'Octagonal sports dial, small seconds at 9, drum date',
+      shape: 'octagon', bezel: 'none', texture: 'matte', indices: 'octo', hands: 'octo', secondsHand: 'needle',
+      smallSecondsAt: 9, subTip: '#ff6a1a', dateAt: 3, dateStyle: 'drum', lowerPrint: ['WATER RESIST', '20BAR'],
+      motion: 'tick', sport: true,
+      defaults: { dial: 'olive', material: 'titanium', tourbillon: false, centralSeconds: false, date: true, nightDial: 'same' },
+    },
+    classicQuartz: {
+      name: 'Classic Quartz', origin: 'Japan', note: 'Everyday quartz: printed numerals, white sticks',
+      bezel: 'none', texture: 'matte', indices: 'numerals', hands: 'stick', secondsHand: 'needle',
+      motion: 'tick', sport: true,
+      defaults: { dial: 'black', material: 'steel', tourbillon: false, centralSeconds: true, date: false, nightDial: 'same' },
     },
     submersible: {
       name: 'Submersible', origin: 'Switzerland', note: 'Gloss dial, round plots, 60-minute scale',
@@ -312,6 +326,33 @@
   function polar(r, a) { return { x: Math.sin(a) * r, y: -Math.cos(a) * r }; }
 
   function circle(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); }
+
+  // Dial outline: round, or an octagon with flats at 12/3/6/9 and softly rounded corners.
+  const OCT_APOTHEM = 0.93, OCT_ROUND = 0.24;
+  function octPath(ctx, r) {
+    const a = r * OCT_APOTHEM, v = a / Math.cos(Math.PI / 8), rc = r * OCT_ROUND;
+    const pts = [];
+    for (let k = 0; k < 8; k++) pts.push(polar(v, Math.PI / 8 + (k * Math.PI) / 4));
+    ctx.beginPath();
+    const m0 = { x: (pts[7].x + pts[0].x) / 2, y: (pts[7].y + pts[0].y) / 2 };
+    ctx.moveTo(m0.x, m0.y);
+    for (let k = 0; k < 8; k++) {
+      const p = pts[k], n = pts[(k + 1) % 8];
+      ctx.arcTo(p.x, p.y, (p.x + n.x) / 2, (p.y + n.y) / 2, rc);
+    }
+    ctx.closePath();
+  }
+  function shapePath(ctx, env, r) {
+    if (env.model.shape === 'octagon') octPath(ctx, r);
+    else circle(ctx, 0, 0, r);
+  }
+  // distance from the centre to the outline at angle a (clockwise from 12)
+  function shapeR(env, a, r) {
+    if (env.model.shape !== 'octagon') return r;
+    const q = Math.PI / 4;
+    const d = a - Math.round(a / q) * q;
+    return (r * OCT_APOTHEM) / Math.cos(d);
+  }
 
   function ring(ctx, x, y, r1, r2) {
     ctx.beginPath();
@@ -513,7 +554,7 @@
       ];
       if (!cfg.tourbillon) g.subs.push({ x: 0, y: Rd * 0.47, r: sr, kind: 'hour' });
     } else if (!cfg.tourbillon && !cfg.centralSeconds) {
-      g.smallSeconds = { x: 0, y: Rd * 0.45, r: Rd * 0.22 };
+      g.smallSeconds = model.smallSecondsAt === 9 ? { x: -Rd * 0.45, y: 0, r: Rd * 0.24 } : { x: 0, y: Rd * 0.45, r: Rd * 0.22 };
     }
     if (model.powerReserve) g.pr = { x: -Rd * 0.42, y: Rd * 0.3, r: Rd * 0.2 };
     return g;
@@ -537,7 +578,7 @@
     ctx.shadowColor = env.shadow;
     ctx.shadowBlur = R * 0.12;
     ctx.shadowOffsetY = R * 0.05;
-    circle(ctx, 0, 0, R);
+    shapePath(ctx, env, R);
     ctx.fillStyle = env.dial.b;
     ctx.fill();
     ctx.restore();
@@ -545,7 +586,7 @@
   }
 
   function drawDiscEdge(ctx, R, env) {
-    circle(ctx, 0, 0, R - R * 0.002);
+    shapePath(ctx, env, R - R * 0.002);
     ctx.strokeStyle = env.lightDial ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.08)';
     ctx.lineWidth = R * 0.004;
     ctx.stroke();
@@ -880,7 +921,7 @@
     const { dial, model } = env;
     const Rd = g.Rd;
     ctx.save();
-    circle(ctx, 0, 0, Rd);
+    shapePath(ctx, env, Rd);
     ctx.clip();
 
     if (!env.glDial) {
@@ -1113,9 +1154,45 @@
     ctx.stroke();
   }
 
+  // Sloped chapter ring of an octagonal dial, with the minute track following the outline.
+  function drawOctTrack(ctx, env, g) {
+    const { dial } = env;
+    const Rd = g.Rd, inner = Rd * 0.86;
+    ctx.save();
+    shapePath(ctx, env, Rd);
+    shapePath(ctx, env, inner);
+    ctx.fillStyle = mix(dial.b, '#000000', 0.18);
+    ctx.fill('evenodd');
+    // the slope catches the light on the side facing away from the lamp
+    const lit = ctx.createConicGradient(-Math.PI / 2, 0, 0);
+    for (let i = 0; i <= 36; i++) {
+      const b = facetLight((i / 36) * TAU + Math.PI);
+      lit.addColorStop(i / 36, b > 0.5 ? `rgba(255,255,255,${(b - 0.5) * 0.18})` : `rgba(0,0,0,${(0.5 - b) * 0.25})`);
+    }
+    shapePath(ctx, env, Rd);
+    shapePath(ctx, env, inner);
+    ctx.fillStyle = lit;
+    ctx.fill('evenodd');
+    ctx.strokeStyle = rgba(dial.ink, 0.85);
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * TAU;
+      const major = i % 5 === 0;
+      if (major) continue;                       // the hour markers sit there
+      ctx.lineWidth = Rd * 0.006;
+      const p0 = polar(shapeR(env, a, inner) + Rd * 0.025, a), p1 = polar(shapeR(env, a, Rd) - Rd * 0.035, a);
+      ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+    }
+    shapePath(ctx, env, inner);
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.lineWidth = Rd * 0.006;
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function drawMinuteTrack(ctx, env, g) {
     const { dial, model } = env;
     const Rd = g.Rd;
+    if (model.shape === 'octagon') { drawOctTrack(ctx, env, g); return; }
     if (model.rehaut) { drawRehaut(ctx, env, g); return; }
     if (model.crosshair) {
       ctx.save();
@@ -1305,6 +1382,30 @@
         ctx.fillStyle = dial.ink;
         ctx.font = `400 ${Rd * (style === 'roman' ? 0.1 : 0.085)}px ${FONTS.didot.css}`;
         ctx.fillText(numerals[h], 0, -r);
+        ctx.restore();
+      } else if (style === 'octo') {
+        // stepped indices: a broad base with a raised, narrower top, reaching into the chapter ring
+        const r2 = shapeR(env, a, Rd * 0.96), len = Rd * 0.21, r1 = r2 - len;
+        const mid = polar((r1 + r2) / 2, a);
+        if (blocked(g, mid, margin) || dateHides(env, h)) continue;
+        const w = Rd * (h === 0 ? 0.05 : 0.07);
+        ctx.save();
+        ctx.rotate(a);
+        const bars = h === 0 ? [-w * 0.62, w * 0.62] : [0];
+        bars.forEach((cx0) => {
+          appliedBar(ctx, env, cx0 - w / 2, -r2, w, len, false, a);
+          appliedBar(ctx, env, cx0 - w * 0.25, -r2 + len * 0.06, w * 0.5, len * 0.62, false, a);
+        });
+        ctx.restore();
+      } else if (style === 'numerals') {
+        // plain printed Arabic numerals, the everyday quartz look
+        const p = polar(Rd * 0.8, a);
+        if (blocked(g, p, margin) || dateHides(env, h)) continue;
+        ctx.save();
+        ctx.fillStyle = env.lumeGlow ? env.lume : dial.ink;
+        if (env.lumeGlow) { ctx.shadowColor = env.lume; ctx.shadowBlur = Rd * 0.03 * ctxScale(ctx); }
+        ctx.font = `500 ${Rd * 0.14}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
+        ctx.fillText(String(h === 0 ? 12 : h), p.x, p.y + Rd * 0.008);
         ctx.restore();
       } else if (style === 'field') {
         // military field dial: bold 1–12 and a small inner 13–24 ring
@@ -1515,6 +1616,19 @@
     return size;
   }
 
+  function drawLowerPrint(ctx, env, g) {
+    const lines = env.model.lowerPrint;
+    if (!lines) return;
+    const Rd = g.Rd;
+    ctx.save();
+    ctx.fillStyle = rgba(env.dial.ink, 0.88);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `600 ${Rd * 0.058}px "Avenir Next","Segoe UI","Helvetica Neue",sans-serif`;
+    lines.forEach((t, i) => spacedText(ctx, t, 0, Rd * (0.47 + i * 0.085), Rd * 0.008));
+    ctx.restore();
+  }
+
   function drawWordmark(ctx, env, g) {
     const { cfg, dial } = env;
     const Rd = g.Rd;
@@ -1546,6 +1660,7 @@
     if (!cfg.date || !model.dateAt || model.subdials) return null;
     const Rd = g.Rd;
     const day = !!model.dayDate;
+    if (model.dateStyle === 'drum') return { x: Rd * 0.62, y: 0, w: Rd * 0.13, h: Rd * 0.34, day: false, drum: true };
     const w = Rd * (day ? 0.3 : 0.15), h = Rd * 0.11;
     if (model.dateAt === 6) return { x: 0, y: Rd * (model.dateY || 0.66), w, h, day };
     const x = Rd * (model.indices === 'dots' || model.indices === 'bigdots' ? 0.66 : 0.64) - (day ? Rd * 0.07 : 0);
@@ -1558,10 +1673,55 @@
     return !!(env.cfg.date && m.dateAt && !m.subdials && m.dateHidesIndex !== false && h % 12 === m.dateAt % 12);
   }
 
+  // Rolling drum date: yesterday, today and tomorrow stacked in a tall window, today marked in orange.
+  function drawDrumDate(ctx, env, g, d) {
+    const Rd = g.Rd;
+    const { x, w, h } = d;
+    ctx.save();
+    // recessed window
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2 - Rd * 0.016, -h / 2 - Rd * 0.016, w + Rd * 0.032, h + Rd * 0.032, Rd * 0.03);
+    ctx.fillStyle = mix(env.dial.b, '#000000', 0.45);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2, -h / 2, w, h, Rd * 0.02);
+    ctx.save();
+    ctx.clip();
+    const drum = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    drum.addColorStop(0, '#6f7275');
+    drum.addColorStop(0.3, '#e9e9e6');
+    drum.addColorStop(0.5, '#f7f7f4');
+    drum.addColorStop(0.7, '#e9e9e6');
+    drum.addColorStop(1, '#6f7275');
+    ctx.fillStyle = drum;
+    ctx.fillRect(x - w / 2, -h / 2, w, h);
+    ctx.fillStyle = '#141416';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const day = 86400000;
+    [[1, -h * 0.34, 0.8], [0, 0, 1], [-1, h * 0.34, 0.8]].forEach(([off, y, sc]) => {
+      const n = new Date(env.date.getTime() + off * day).getDate();
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(1, sc);                      // numbers curve away on the drum
+      ctx.font = `600 ${h * 0.26}px "DIN Alternate",Bahnschrift,"Avenir Next",sans-serif`;
+      ctx.fillText(String(n), 0, h * 0.01);
+      ctx.restore();
+    });
+    ctx.restore();
+    // orange marker pointing at today
+    ctx.fillStyle = '#ff6a1a';
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2 - Rd * 0.085, -Rd * 0.012, Rd * 0.045, Rd * 0.024, Rd * 0.004);
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawDate(ctx, env, g) {
     const { dial, mat } = env;
     const d = dateGeometry(env, g);
     if (!d) return;
+    if (d.drum) { drawDrumDate(ctx, env, g, d); return; }
     const Rd = g.Rd;
     const { x, w, h } = d;
     ctx.save();
@@ -2077,6 +2237,20 @@
       finish: 'gmt',
       lume(c) { c.moveTo(0, -L * 0.97); c.lineTo(-W * 2.1, -L * 0.865); c.lineTo(W * 2.1, -L * 0.865); c.closePath(); },
     }),
+    // broad matte baton with a long lume strip (octagonal sports dial)
+    octo: (L, W) => ({
+      path(c) {
+        c.moveTo(-W / 2, L * 0.16); c.lineTo(-W / 2, -L * 0.9); c.lineTo(0, -L);
+        c.lineTo(W / 2, -L * 0.9); c.lineTo(W / 2, L * 0.16); c.closePath();
+      },
+      finish: 'facets',
+      lume(c) { c.roundRect(-W * 0.2, -L * 0.9, W * 0.4, L * 0.66, W * 0.2); },
+    }),
+    // plain white sticks (everyday quartz)
+    stick: (L, W) => ({
+      path(c) { c.roundRect(-W / 2, -L, W, L * 1.12, W * 0.3); },
+      finish: 'white',
+    }),
     sub: (L, W) => ({
       path(c) { c.roundRect(-W * 0.5, -L, W, L * 1.2, W * 0.5); },
       finish: 'sub',
@@ -2120,7 +2294,7 @@
       ctx.lineWidth = Math.max(0.3, W * 0.03);
       ctx.stroke();
     } else {
-      const base = finish === 'sub' ? (luminance(env.dial.sub) > 0.5 ? '#151517' : '#f1efe9')
+      const base = finish === 'white' ? '#f2f1ed' : finish === 'sub' ? (luminance(env.dial.sub) > 0.5 ? '#151517' : '#f1efe9')
         : finish === 'gmt' ? '#d23a2c' : env.accent;
       outline();
       ctx.fillStyle = base;
@@ -2133,6 +2307,10 @@
       ctx.fillRect(-W * 5, -L * 1.1, W * 5, L * 1.5);
       ctx.fillStyle = rgba('#000000', 0.18 * (1 - facetLight(angle + Math.PI / 2)));
       ctx.fillRect(0, -L * 1.1, W * 5, L * 1.5);
+      if (finish === 'sub' && env.model.subTip) {
+        ctx.fillStyle = env.model.subTip;
+        ctx.fillRect(-W * 3, -L * 1.05, W * 6, L * 0.34);
+      }
       ctx.restore();
     }
     if (shape.lume) {
@@ -2203,7 +2381,7 @@
       ctx.restore();
     }
     const kind = model.hands;
-    const widths = { dauphine: [0.085, 0.07], baton: [0.06, 0.045], sword: [0.085, 0.065], pilot: [0.1, 0.075], breguet: [0.055, 0.045], feuille: [0.085, 0.065], faceted: [0.09, 0.062], arrow: [0.11, 0.07], snowflake: [0.11, 0.07], skeletonSword: [0.085, 0.065] }[kind];
+    const widths = { dauphine: [0.085, 0.07], baton: [0.06, 0.045], sword: [0.085, 0.065], pilot: [0.1, 0.075], breguet: [0.055, 0.045], feuille: [0.085, 0.065], faceted: [0.09, 0.062], arrow: [0.11, 0.07], snowflake: [0.11, 0.07], skeletonSword: [0.085, 0.065], octo: [0.1, 0.075], stick: [0.035, 0.026] }[kind];
     if (model.gmt) {
       const gA = ((t.h + t.m / 60) / 24) * TAU;
       drawHand(ctx, env, 'gmt', Rd * 0.9, Rd * 0.016, gA, 0.4);
@@ -2237,7 +2415,7 @@
     const Rd = g.Rd;
     const dark = env.dark;
     ctx.save();
-    circle(ctx, 0, 0, Rd * 1.005);
+    shapePath(ctx, env, Rd * 1.005);
     ctx.clip();
     // rehaut: the dial edge sits in the shadow of the case wall, deeper on the far side
     const rh = ctx.createRadialGradient(-Rd * 0.04, -Rd * 0.06, Rd * 0.86, 0, 0, Rd * 1.01);
@@ -2292,6 +2470,20 @@
     ctx.lineCap = 'round';
     const k = Math.max(0.6, Rd * 0.004);
     ctx.lineWidth = k;
+    if (env.model.shape === 'octagon') {
+      // follow the octagon: a conic sweep of light, brightest where the edge faces the lamp
+      const cg = ctx.createConicGradient(-Math.PI / 2, 0, 0);
+      for (let i = 0; i <= 36; i++) {
+        const a = (i / 36) * TAU;
+        const w = Math.pow(Math.max(0, Math.cos(a - KEY)), 3);
+        cg.addColorStop(i / 36, warmWhite((dark ? 0.22 : 0.45) * w * POWER));
+      }
+      ctx.strokeStyle = cg;
+      shapePath(ctx, env, Rd * 0.996);
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
     for (let i = 0; i < 24; i++) {
       const a0 = KEY - 1.3 + (i / 24) * 2.6, a1 = a0 + 2.6 / 24 + 0.002;
       const w = Math.pow(Math.cos(((i + 0.5) / 24 - 0.5) * Math.PI), 2);
@@ -2319,6 +2511,7 @@
     if (g.smallSeconds) drawSubdial(ctx, env, Object.assign({ kind: 'sec' }, g.smallSeconds));
     drawEmblem(ctx, env, g);
     drawWordmark(ctx, env, g);
+    drawLowerPrint(ctx, env, g);
     drawDate(ctx, env, g);
     drawPowerReserve(ctx, env, g);
     if (g.ap) drawApertureStatic(ctx, env, g);
@@ -2594,7 +2787,13 @@
       const img = gpuDial(this.glKind, this.env.dial, px, tilt);
       if (!img) return;
       const off = (this.box - Rd) * this.dpr;
+      ctx.save();
+      ctx.translate(this.box * this.dpr, this.box * this.dpr);
+      shapePath(ctx, this.env, Rd * this.dpr);
+      ctx.clip();
+      ctx.translate(-this.box * this.dpr, -this.box * this.dpr);
       ctx.drawImage(img, off, off, px, px);
+      ctx.restore();
     }
     // Crystal reflections, magnifier and dial edge: cheap 2D, redrawn as the light turns.
     _renderGlass() {
